@@ -1,0 +1,28 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "tasks": {
+    "build": {
+      "dependsOn": ["check:type", "^build"],
+      "outputs": ["dist/**"]
+    },
+    "dev": {
+      "cache": false,
+      "persistent": true
+    },
+    "test": {
+      "outputs": []
+    },
+    "test:coverage": {
+      "outputs": ["coverage/**", "junit.xml"]
+    },
+    "lint": {
+      "outputs": []
+    },
+    "lint:report": {
+      "outputs": ["eslint_report.json"]
+    },
+    "check:type": {
+      "outputs": []
+    }
+  }
+}
