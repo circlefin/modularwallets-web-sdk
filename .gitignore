@@ -1,0 +1,23 @@
+# dependencies
+node_modules
+
+# production
+/**/dist
+
+# testing
+.jest
+coverage
+junit.xml
+
+# build
+tsconfig*.tsbuildinfo
+
+# turborepo
+.turbo
+
+# ESLint report
+eslint_report.json
+eslint_group.txt
+
+# env files
+.env
