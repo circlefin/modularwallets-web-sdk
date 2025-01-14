@@ -1,0 +1,45 @@
+{
+  "name": "@circle-fin/modular-wallets-core",
+  "description": "Serverless Typescript SDK",
+  "version": "1.0.0",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "license": "Apache-2.0",
+  "files": [
+    "dist",
+    "package.json",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "check:type": "tsc --project tsconfig.json --pretty --noEmit",
+    "lint": "eslint --ext .js,.jsx,.ts,.tsx,.json . --fix",
+    "lint:report": "eslint --ext .js,.jsx,.ts,.tsx,.json . --output-file eslint_report.json --format json",
+    "test": "jest",
+    "test:coverage": "jest --coverage"
+  },
+  "dependencies": {
+    "uuid": "^11.0.3",
+    "viem": "^2.21.27",
+    "web3": "^4.13.0",
+    "webauthn-p256": "0.0.5"
+  },
+  "devDependencies": {
+    "@templates/eslint-config": "*",
+    "@templates/jest": "*",
+    "@templates/tsconfig": "*",
+    "jest-environment-jsdom": "^29.7.0",
+    "jest-fetch-mock": "^3.0.3",
+    "tsup": "^8.3.0"
+  },
+  "keywords": [
+    "circle",
+    "circle.com",
+    "usdc",
+    "euroc",
+    "stablecoins",
+    "modular wallets"
+  ]
+}
