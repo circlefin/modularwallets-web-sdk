@@ -1,0 +1,12 @@
+{
+  "extends": "@templates/tsconfig/node.json",
+  "include": ["src", "jest.*", "tsup.config.ts", "globals.d.ts"],
+  "exclude": ["node_modules", "dist"],
+  "compilerOptions": {
+    "baseUrl": ".",
+    "lib": ["dom"],
+    "module": "esnext",
+    "moduleResolution": "node",
+    "types": ["jest", "node"]
+  }
+}

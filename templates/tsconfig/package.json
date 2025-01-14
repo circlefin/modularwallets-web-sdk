@@ -1,0 +1,10 @@
+{
+  "name": "@templates/tsconfig",
+  "version": "1.0.0",
+  "description": "Base typescript config",
+  "private": "false",
+  "files": [
+    "base.json",
+    "node.json"
+  ]
+}

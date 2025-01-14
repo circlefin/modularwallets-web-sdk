@@ -1,1 +1,94 @@
-# modularwallets-web-sdk
+# w3s-web-core-sdk
+
+Repository for the Circle Modular Wallet Web SDK (*aka.* BW Web SDK or Buidl Wallet Web SDK)
+
+## Examples
+
+We've created some example apps in the [examples](./examples/) folder:
+
+- [Circle Smart Account](./examples/circle-smart-account/)
+
+You should be able to run these example apps locally and please follow the instructions under each example's `README` file.
+
+## Setup Guide
+
+Please follow this guide to setup your development environment and start building!
+
+### Install dependencies
+
+Please ensure you are using the correct Node.js version.
+
+We have provided a `.nvmrc` file which can be understood by [nvm](https://github.com/nvm-sh/nvm), [fnm](https://github.com/Schniz/fnm), and [n](https://github.com/tj/n):
+
+```zsh
+nvm use || fnm use || n auto
+```
+
+> [!NOTE]
+> If you are unfamiliar with Node.js version managers, please refer to [our example using `nvm`](#example-installing-a-node-version-manager)
+
+Confirm that you are using the correct Node.js version listed in the `.nvmrc` file with:
+
+```zsh
+node -v
+```
+
+This project uses `yarn` to install dependencies, please ensure you have it installed.
+
+> [!TIP]
+> Since Node.js v14.19, you can use the [corepack](https://github.com/nodejs/corepack) command to enable `yarn`:
+>
+> ```zsh
+> corepack enable
+> ```
+
+You can confirm that you have `yarn` installed with:
+
+```zsh
+yarn -v
+```
+
+You can now install the project dependencies using `yarn`:
+
+```zsh
+yarn install
+```
+
+> [!TIP]
+> It is good practice to run the `yarn install` command every time dependencies in the `package.json` are changed when updating your branch
+
+#### Example: installing a node version manager
+
+Install `nvm` to use different versions of node and npm easily.
+
+```zsh
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash
+```
+
+You can then install the Node.js version of the project by using:
+
+```zsh
+nvm use
+```
+
+### Lint
+
+To lint the project:
+
+```zsh
+yarn lint
+```
+
+### Test
+
+To run all unit tests, run:
+
+```zsh
+yarn test
+```
+
+To generate coverage reports:
+
+```zsh
+yarn test:coverage
+```

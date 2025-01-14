@@ -1,0 +1,13 @@
+{
+  "files.insertFinalNewline": true,
+  "editor.formatOnSave": false,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit"
+  },
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "eslint.workingDirectories": [
+    { "pattern": "./packages/*/" },
+    { "pattern": "./templates/*/" },
+    { "pattern": "./examples/*/" }
+  ]
+}

@@ -1,0 +1,8 @@
+{
+  "name": "modular-wallets-provider",
+  "version": "0.0.0",
+  "private": true,
+  "dependencies": {
+    "w3s-web-core-sdk": "file:../../packages/w3s-web-core-sdk"
+  }
+}
