@@ -449,6 +449,16 @@
   resolved "https://registry.yarnpkg.com/@bcoe/v8-coverage/-/v8-coverage-0.2.3.tgz#75a2e8b51cb758a7553d6804a5932d7aace75c39"
   integrity sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==
 
+"@circle-fin/modular-wallets-core@^1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/@circle-fin/modular-wallets-core/-/modular-wallets-core-1.0.0.tgz#253aeb0a3a2c82bede85fb4cb1445ef4347e9d1a"
+  integrity sha512-fNbJpxVC2dsTbvxfSjHPYbnEY3ZxDI/gOUDhuXHaWG/17rePPnFN/ULuECAdo3L60DuL58CD7peYZh+QP7dGrQ==
+  dependencies:
+    uuid "^11.0.3"
+    viem "^2.21.27"
+    web3 "^4.13.0"
+    webauthn-p256 "0.0.5"
+
 "@cspotcode/source-map-support@^0.8.0":
   version "0.8.1"
   resolved "https://registry.yarnpkg.com/@cspotcode/source-map-support/-/source-map-support-0.8.1.tgz#00629c35a688e05a88b1cda684fb9d5e73f000a1"
@@ -5405,14 +5415,6 @@ w3c-xmlserializer@^4.0.0:
   integrity sha512-d+BFHzbiCx6zGfz0HyQ6Rg69w9k19nviJspaj4yNscGjrHu94sVP+aRm75yEbCh+r2/yR+7q6hux9LVtbuTGBw==
   dependencies:
     xml-name-validator "^4.0.0"
-
-"w3s-web-core-sdk@file:packages/w3s-web-core-sdk":
-  version "1.0.0"
-  dependencies:
-    uuid "^11.0.3"
-    viem "^2.21.27"
-    web3 "^4.13.0"
-    webauthn-p256 "0.0.5"
 
 walker@^1.0.8:
   version "1.0.8"
