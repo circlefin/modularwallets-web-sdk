@@ -65,7 +65,7 @@ export async function toWebAuthnCredential(
  * @param username - The username to use.
  * @returns A WebAuthn Credential.
  */
-export async function startRegistration(
+async function startRegistration(
   client: RpClient,
   username: string | null = null,
 ): Promise<WebAuthnCredential> {
@@ -115,7 +115,7 @@ export async function startRegistration(
  * @param credentialId - The credential ID to use.
  * @returns A WebAuthn Credential.
  */
-export async function startAuthentication(
+async function startAuthentication(
   client: RpClient,
   credentialId: string | null = null,
 ): Promise<WebAuthnCredential> {
@@ -161,7 +161,7 @@ export async function startAuthentication(
  * @param options - CustomPublicKeyCredentialCreationOptions instance.
  * @returns PublicKeyCredentialCreationOptions instance.
  */
-export function getCredentialCreationOptions(
+function getCredentialCreationOptions(
   options: CustomPublicKeyCredentialCreationOptions,
 ): PublicKeyCredentialCreationOptions {
   return {
@@ -179,7 +179,7 @@ export function getCredentialCreationOptions(
  * @param options - CustomPublicKeyCredentialRequestOptions instance.
  * @returns PublicKeyCredentialRequestOptions instance.
  */
-export function getCredentialRequestOptions(
+function getCredentialRequestOptions(
   options: CustomPublicKeyCredentialRequestOptions,
 ): PublicKeyCredentialRequestOptions {
   return {

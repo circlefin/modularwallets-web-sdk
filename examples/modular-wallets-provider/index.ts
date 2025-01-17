@@ -1,6 +1,6 @@
 import { publicActions } from "viem"
 import { createBundlerClient } from "viem/account-abstraction"
-import { toModularTransport } from "w3s-web-core-sdk"
+import { toModularTransport } from "@circle-fin/modular-wallets-core"
 
 const transport = toModularTransport("<my-client-url>", "<my-client-key>")
 

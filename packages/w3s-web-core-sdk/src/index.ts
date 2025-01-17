@@ -25,14 +25,34 @@ export * from './actions'
 // Clients
 export * from './clients'
 
-// Constants
-export * from './constants'
-
 // Providers
 export * from './providers'
 
 // Types
-export * from './types'
-
-// Utils
-export * from './utils'
+export {
+  WebAuthnMode,
+  type AuthenticatorAssertionResponse,
+  type AuthenticatorAttestationResponse,
+  type CircleSmartAccountImplementation,
+  type CreateCredentialParameters,
+  type CustomPublicKeyCredentialCreationOptions,
+  type CustomPublicKeyCredentialDescriptor,
+  type CustomPublicKeyCredentialRequestOptions,
+  type CustomPublicKeyCredentialUserEntity,
+  type GetAddressReturnType,
+  type GetAddressRpcSchema,
+  type GetLoginOptionsReturnType,
+  type GetLoginOptionsRpcSchema,
+  type GetLoginVerificationReturnType,
+  type GetLoginVerificationRpcSchema,
+  type GetRegistrationOptionsReturnType,
+  type GetRegistrationOptionsRpcSchema,
+  type GetRegistrationVerificationReturnType,
+  type GetRegistrationVerificationRpcSchema,
+  type ModularWalletRpcSchema,
+  type RpRpcSchema,
+  type ToCircleSmartAccountParameters,
+  type ToCircleSmartAccountReturnType,
+  type ToWebAuthnAccountParameters,
+  type WebAuthnCredential,
+} from './types'
