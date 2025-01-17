@@ -1,11 +1,13 @@
 {
   "name": "@circle-fin/modular-wallets-core",
   "description": "Serverless Typescript SDK",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
   "license": "Apache-2.0",
+  "homepage": "https://developers.circle.com/w3s/modular-wallets-web-sdk",
+  "repository": "circlefin/modularwallets-web-sdk",
   "files": [
     "dist",
     "package.json",
