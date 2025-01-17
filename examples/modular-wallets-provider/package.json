@@ -3,6 +3,6 @@
   "version": "0.0.0",
   "private": true,
   "dependencies": {
-    "w3s-web-core-sdk": "file:../../packages/w3s-web-core-sdk"
+    "@circle-fin/modular-wallets-core": "^1.0.0"
   }
 }

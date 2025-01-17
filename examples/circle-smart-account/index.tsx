@@ -16,7 +16,7 @@ import {
   toModularTransport,
   toPasskeyTransport,
   toWebAuthnCredential,
-} from 'w3s-web-core-sdk'
+} from '@circle-fin/modular-wallets-core'
 
 const clientKey = import.meta.env.VITE_CLIENT_KEY as string
 const clientUrl = import.meta.env.VITE_CLIENT_URL as string
