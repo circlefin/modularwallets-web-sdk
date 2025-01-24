@@ -16,8 +16,4 @@
  * limitations under the License.
  */
 
-export * from './base'
-export * from './modular-wallets'
-export * from './paymaster'
-export * from './rp'
-export * from './eip-1193'
+export * from './EIP1193.Mock'
