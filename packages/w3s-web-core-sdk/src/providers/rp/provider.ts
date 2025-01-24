@@ -17,9 +17,9 @@
  */
 
 import { InvalidProviderError, MethodNotImplementedError } from 'web3-errors'
-import { Web3BaseProvider } from 'web3-types'
 
 import { fetchFromApi, validateClientUrl } from '../../utils'
+import { BaseProvider } from '../base'
 
 import type {
   EthExecutionAPI,
@@ -27,7 +27,6 @@ import type {
   Web3APIPayload,
   Web3APIReturnType,
   Web3APISpec,
-  Web3ProviderStatus,
 } from 'web3-types'
 
 /**
@@ -37,7 +36,7 @@ import type {
  */
 export default class RpProvider<
   API extends Web3APISpec = EthExecutionAPI,
-> extends Web3BaseProvider<API> {
+> extends BaseProvider<API> {
   public readonly clientUrl: string
   private readonly clientKey: string
 
@@ -76,85 +75,5 @@ export default class RpProvider<
         // Only support the above methods, throw an error for any other method.
         throw new MethodNotImplementedError()
     }
-  }
-
-  /**
-   * This is an abstract method from the parent class but we don't need it for this provider.
-   * @throws MethodNotImplementedError.
-   */
-  public getStatus(): Web3ProviderStatus {
-    throw new MethodNotImplementedError()
-  }
-
-  /**
-   * This is an abstract method from the parent class but we don't need it for this provider.
-   * @Returns false.
-   */
-  public supportsSubscriptions() {
-    return false
-  }
-
-  /**
-   * This is an abstract method from the parent class but we don't need it for this provider.
-   * @throws MethodNotImplementedError.
-   */
-  public on() {
-    throw new MethodNotImplementedError()
-  }
-
-  /**
-   * This is an abstract method from the parent class but we don't need it for this provider.
-   * @throws MethodNotImplementedError.
-   */
-  public removeListener() {
-    throw new MethodNotImplementedError()
-  }
-
-  /**
-   * This is an abstract method from the parent class but we don't need it for this provider.
-   * @throws MethodNotImplementedError.
-   */
-  public once() {
-    throw new MethodNotImplementedError()
-  }
-
-  /**
-   * This is an abstract method from the parent class but we don't need it for this provider.
-   * @throws MethodNotImplementedError.
-   */
-  public removeAllListeners() {
-    throw new MethodNotImplementedError()
-  }
-
-  /**
-   * This is an abstract method from the parent class but we don't need it for this provider.
-   * @throws MethodNotImplementedError.
-   */
-  public connect() {
-    throw new MethodNotImplementedError()
-  }
-
-  /**
-   * This is an abstract method from the parent class but we don't need it for this provider.
-   * @throws MethodNotImplementedError.
-   */
-  public disconnect() {
-    throw new MethodNotImplementedError()
-  }
-
-  /**
-   * This is an abstract method from the parent class but we don't need it for this provider.
-   * @throws MethodNotImplementedError.
-   */
-  public reset() {
-    throw new MethodNotImplementedError()
-  }
-
-  /**
-   * This is an abstract method from the parent class but we don't need it for this provider.
-   * @throws MethodNotImplementedError.
-   */
-  public reconnect() {
-    throw new MethodNotImplementedError()
   }
 }
