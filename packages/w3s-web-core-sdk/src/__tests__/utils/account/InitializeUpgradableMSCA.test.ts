@@ -26,7 +26,6 @@ import {
 } from '../../../abis'
 import { toWebAuthnCredential } from '../../../accounts'
 import {
-  CIRCLE_DEFAULT_TOKEN_CALLBACK_PLUGIN,
   CIRCLE_WEIGHTED_WEB_AUTHN_MULTISIG_PLUGIN,
   PUBLIC_KEY_OWN_WEIGHTS,
   THRESHOLD_WEIGHT,
@@ -69,15 +68,9 @@ describe('Utils > account > initializeUpgradableMSCA > getInitializeUpgradableMS
       abi: UPGRADABLE_MSCA.abi,
       functionName: 'initializeUpgradableMSCA',
       args: [
-        [
-          CIRCLE_WEIGHTED_WEB_AUTHN_MULTISIG_PLUGIN.address,
-          CIRCLE_DEFAULT_TOKEN_CALLBACK_PLUGIN.address,
-        ],
-        [
-          CIRCLE_WEIGHTED_WEB_AUTHN_MULTISIG_PLUGIN.manifestHash,
-          CIRCLE_DEFAULT_TOKEN_CALLBACK_PLUGIN.manifestHash,
-        ],
-        [pluginInstallParams, CIRCLE_DEFAULT_TOKEN_CALLBACK_PLUGIN.installData],
+        [CIRCLE_WEIGHTED_WEB_AUTHN_MULTISIG_PLUGIN.address],
+        [CIRCLE_WEIGHTED_WEB_AUTHN_MULTISIG_PLUGIN.manifestHash],
+        [pluginInstallParams],
       ],
     })
 
@@ -115,15 +108,9 @@ describe('Utils > account > initializeUpgradableMSCA > getInitializeUpgradableMS
     const expectedEncodedResult = encodeAbiParameters(
       INITIALIZING_DATA_ABI_PARAMS,
       [
-        [
-          CIRCLE_WEIGHTED_WEB_AUTHN_MULTISIG_PLUGIN.address,
-          CIRCLE_DEFAULT_TOKEN_CALLBACK_PLUGIN.address,
-        ],
-        [
-          CIRCLE_WEIGHTED_WEB_AUTHN_MULTISIG_PLUGIN.manifestHash,
-          CIRCLE_DEFAULT_TOKEN_CALLBACK_PLUGIN.manifestHash,
-        ],
-        [pluginInstallParams, CIRCLE_DEFAULT_TOKEN_CALLBACK_PLUGIN.installData],
+        [CIRCLE_WEIGHTED_WEB_AUTHN_MULTISIG_PLUGIN.address],
+        [CIRCLE_WEIGHTED_WEB_AUTHN_MULTISIG_PLUGIN.manifestHash],
+        [pluginInstallParams],
       ],
     )
 

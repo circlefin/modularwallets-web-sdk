@@ -245,7 +245,39 @@ export const CIRCLE_MSCA_6900_V1_EP07_ABI = [
   { stateMutability: 'payable', type: 'fallback' },
   {
     inputs: [],
+    name: 'AUTHOR',
+    outputs: [{ internalType: 'string', name: '', type: 'string' }],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'ENTRY_POINT',
+    outputs: [
+      { internalType: 'contract IEntryPoint', name: '', type: 'address' },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'PLUGIN_MANAGER',
+    outputs: [
+      { internalType: 'contract PluginManager', name: '', type: 'address' },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
     name: 'UPGRADE_INTERFACE_VERSION',
+    outputs: [{ internalType: 'string', name: '', type: 'string' }],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'VERSION',
     outputs: [{ internalType: 'string', name: '', type: 'string' }],
     stateMutability: 'view',
     type: 'function',
@@ -255,22 +287,6 @@ export const CIRCLE_MSCA_6900_V1_EP07_ABI = [
     name: 'addDeposit',
     outputs: [],
     stateMutability: 'payable',
-    type: 'function',
-  },
-  {
-    inputs: [],
-    name: 'author',
-    outputs: [{ internalType: 'string', name: '', type: 'string' }],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [],
-    name: 'entryPoint',
-    outputs: [
-      { internalType: 'contract IEntryPoint', name: '', type: 'address' },
-    ],
-    stateMutability: 'view',
     type: 'function',
   },
   {
@@ -477,12 +493,41 @@ export const CIRCLE_MSCA_6900_V1_EP07_ABI = [
     type: 'function',
   },
   {
-    inputs: [],
-    name: 'pluginManager',
-    outputs: [
-      { internalType: 'contract PluginManager', name: '', type: 'address' },
+    inputs: [
+      { internalType: 'address', name: '', type: 'address' },
+      { internalType: 'address', name: '', type: 'address' },
+      { internalType: 'uint256[]', name: '', type: 'uint256[]' },
+      { internalType: 'uint256[]', name: '', type: 'uint256[]' },
+      { internalType: 'bytes', name: '', type: 'bytes' },
     ],
-    stateMutability: 'view',
+    name: 'onERC1155BatchReceived',
+    outputs: [{ internalType: 'bytes4', name: '', type: 'bytes4' }],
+    stateMutability: 'pure',
+    type: 'function',
+  },
+  {
+    inputs: [
+      { internalType: 'address', name: '', type: 'address' },
+      { internalType: 'address', name: '', type: 'address' },
+      { internalType: 'uint256', name: '', type: 'uint256' },
+      { internalType: 'uint256', name: '', type: 'uint256' },
+      { internalType: 'bytes', name: '', type: 'bytes' },
+    ],
+    name: 'onERC1155Received',
+    outputs: [{ internalType: 'bytes4', name: '', type: 'bytes4' }],
+    stateMutability: 'pure',
+    type: 'function',
+  },
+  {
+    inputs: [
+      { internalType: 'address', name: '', type: 'address' },
+      { internalType: 'address', name: '', type: 'address' },
+      { internalType: 'uint256', name: '', type: 'uint256' },
+      { internalType: 'bytes', name: '', type: 'bytes' },
+    ],
+    name: 'onERC721Received',
+    outputs: [{ internalType: 'bytes4', name: '', type: 'bytes4' }],
+    stateMutability: 'pure',
     type: 'function',
   },
   {
@@ -497,6 +542,20 @@ export const CIRCLE_MSCA_6900_V1_EP07_ABI = [
     name: 'supportsInterface',
     outputs: [{ internalType: 'bool', name: '', type: 'bool' }],
     stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      { internalType: 'address', name: 'operator', type: 'address' },
+      { internalType: 'address', name: 'from', type: 'address' },
+      { internalType: 'address', name: 'to', type: 'address' },
+      { internalType: 'uint256', name: 'amount', type: 'uint256' },
+      { internalType: 'bytes', name: 'userData', type: 'bytes' },
+      { internalType: 'bytes', name: 'operatorData', type: 'bytes' },
+    ],
+    name: 'tokensReceived',
+    outputs: [],
+    stateMutability: 'pure',
     type: 'function',
   },
   {
@@ -554,13 +613,6 @@ export const CIRCLE_MSCA_6900_V1_EP07_ABI = [
       { internalType: 'uint256', name: 'validationData', type: 'uint256' },
     ],
     stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
-    inputs: [],
-    name: 'version',
-    outputs: [{ internalType: 'string', name: '', type: 'string' }],
-    stateMutability: 'view',
     type: 'function',
   },
   {
