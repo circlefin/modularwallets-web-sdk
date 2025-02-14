@@ -221,7 +221,7 @@ export const GetCodeResult = '0x12345'
  */
 export const MockWallet: ModularWallet = {
   id: 'test-id',
-  address: '0x2F96BdFdef089e4219375Df39fee743AF5D8C0BA',
+  address: '0x0f6Fed7D7526Aaa1692438AD1D77AaA0Ea9d0a56',
   blockchain: 'ETH-SEPOLIA',
   state: 'LIVE',
   scaCore: 'circle_6900_v1',

@@ -33,7 +33,7 @@ describe('Smart Account Constants', () => {
     expect(FACTORY).toBeDefined()
     expect(FACTORY).toHaveProperty('abi')
     expect(FACTORY).toHaveProperty('address')
-    expect(FACTORY.address).toBe('0xc83d88C018D143d08AFE910221D445189Fc6817a')
+    expect(FACTORY.address).toBe('0x0000000DF7E6c9Dc387cAFc5eCBfa6c3a6179AdD')
   })
 
   it('should export stub signature', () => {

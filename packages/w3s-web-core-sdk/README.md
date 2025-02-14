@@ -22,3 +22,5 @@ npm install @circle-fin/modular-wallets-core
 We've created some example apps in the [examples](https://github.com/circlefin/modularwallets-web-sdk/tree/master/examples) folder:
 
 - [circle-smart-account](https://github.com/circlefin/modularwallets-web-sdk/tree/master/examples/circle-smart-account)
+
+- [eip-1193](https://github.com/circlefin/modularwallets-web-sdk/tree/master/examples/eip-1193)

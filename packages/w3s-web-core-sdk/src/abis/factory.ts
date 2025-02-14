@@ -18,376 +18,248 @@
 
 export const CIRCLE_MSCA_6900_V1_EP07_FACTORY_ABI = [
   {
+    inputs: [
+      { internalType: 'address', name: '_owner', type: 'address' },
+      { internalType: 'address', name: '_entryPointAddr', type: 'address' },
+      { internalType: 'address', name: '_pluginManagerAddr', type: 'address' },
+    ],
+    stateMutability: 'nonpayable',
     type: 'constructor',
+  },
+  { inputs: [], name: 'Create2FailedDeployment', type: 'error' },
+  { inputs: [], name: 'InvalidInitializationInput', type: 'error' },
+  { inputs: [], name: 'InvalidLength', type: 'error' },
+  {
+    inputs: [{ internalType: 'address', name: 'owner', type: 'address' }],
+    name: 'OwnableInvalidOwner',
+    type: 'error',
+  },
+  {
+    inputs: [{ internalType: 'address', name: 'account', type: 'address' }],
+    name: 'OwnableUnauthorizedAccount',
+    type: 'error',
+  },
+  {
+    inputs: [{ internalType: 'address', name: 'plugin', type: 'address' }],
+    name: 'PluginIsNotAllowed',
+    type: 'error',
+  },
+  {
+    anonymous: false,
     inputs: [
       {
-        name: '_owner',
-        type: 'address',
+        indexed: true,
         internalType: 'address',
-      },
-      {
-        name: '_entryPointAddr',
-        type: 'address',
-        internalType: 'address',
-      },
-      {
-        name: '_pluginManagerAddr',
-        type: 'address',
-        internalType: 'address',
-      },
-    ],
-    stateMutability: 'nonpayable',
-  },
-  {
-    type: 'receive',
-    stateMutability: 'payable',
-  },
-  {
-    type: 'function',
-    name: 'acceptOwnership',
-    inputs: [],
-    outputs: [],
-    stateMutability: 'nonpayable',
-  },
-  {
-    type: 'function',
-    name: 'accountImplementation',
-    inputs: [],
-    outputs: [
-      {
-        name: '',
-        type: 'address',
-        internalType: 'contract UpgradableMSCA',
-      },
-    ],
-    stateMutability: 'view',
-  },
-  {
-    type: 'function',
-    name: 'addStake',
-    inputs: [
-      {
-        name: '_unstakeDelaySec',
-        type: 'uint32',
-        internalType: 'uint32',
-      },
-    ],
-    outputs: [],
-    stateMutability: 'payable',
-  },
-  {
-    type: 'function',
-    name: 'createAccount',
-    inputs: [
-      {
-        name: '_sender',
-        type: 'bytes32',
-        internalType: 'bytes32',
-      },
-      {
-        name: '_salt',
-        type: 'bytes32',
-        internalType: 'bytes32',
-      },
-      {
-        name: '_initializingData',
-        type: 'bytes',
-        internalType: 'bytes',
-      },
-    ],
-    outputs: [
-      {
-        name: 'account',
-        type: 'address',
-        internalType: 'contract UpgradableMSCA',
-      },
-    ],
-    stateMutability: 'nonpayable',
-  },
-  {
-    type: 'function',
-    name: 'entryPoint',
-    inputs: [],
-    outputs: [
-      {
-        name: '',
-        type: 'address',
-        internalType: 'contract IEntryPoint',
-      },
-    ],
-    stateMutability: 'view',
-  },
-  {
-    type: 'function',
-    name: 'getAddress',
-    inputs: [
-      {
-        name: '_sender',
-        type: 'bytes32',
-        internalType: 'bytes32',
-      },
-      {
-        name: '_salt',
-        type: 'bytes32',
-        internalType: 'bytes32',
-      },
-      {
-        name: '_initializingData',
-        type: 'bytes',
-        internalType: 'bytes',
-      },
-    ],
-    outputs: [
-      {
-        name: 'addr',
-        type: 'address',
-        internalType: 'address',
-      },
-      {
-        name: 'mixedSalt',
-        type: 'bytes32',
-        internalType: 'bytes32',
-      },
-    ],
-    stateMutability: 'view',
-  },
-  {
-    type: 'function',
-    name: 'isPluginAllowed',
-    inputs: [
-      {
-        name: '',
-        type: 'address',
-        internalType: 'address',
-      },
-    ],
-    outputs: [
-      {
-        name: '',
-        type: 'bool',
-        internalType: 'bool',
-      },
-    ],
-    stateMutability: 'view',
-  },
-  {
-    type: 'function',
-    name: 'owner',
-    inputs: [],
-    outputs: [
-      {
-        name: '',
-        type: 'address',
-        internalType: 'address',
-      },
-    ],
-    stateMutability: 'view',
-  },
-  {
-    type: 'function',
-    name: 'pendingOwner',
-    inputs: [],
-    outputs: [
-      {
-        name: '',
-        type: 'address',
-        internalType: 'address',
-      },
-    ],
-    stateMutability: 'view',
-  },
-  {
-    type: 'function',
-    name: 'renounceOwnership',
-    inputs: [],
-    outputs: [],
-    stateMutability: 'nonpayable',
-  },
-  {
-    type: 'function',
-    name: 'setPlugins',
-    inputs: [
-      {
-        name: '_plugins',
-        type: 'address[]',
-        internalType: 'address[]',
-      },
-      {
-        name: '_permissions',
-        type: 'bool[]',
-        internalType: 'bool[]',
-      },
-    ],
-    outputs: [],
-    stateMutability: 'nonpayable',
-  },
-  {
-    type: 'function',
-    name: 'transferOwnership',
-    inputs: [
-      {
-        name: 'newOwner',
-        type: 'address',
-        internalType: 'address',
-      },
-    ],
-    outputs: [],
-    stateMutability: 'nonpayable',
-  },
-  {
-    type: 'function',
-    name: 'unlockStake',
-    inputs: [],
-    outputs: [],
-    stateMutability: 'nonpayable',
-  },
-  {
-    type: 'function',
-    name: 'withdrawStake',
-    inputs: [
-      {
-        name: '_withdrawAddress',
-        type: 'address',
-        internalType: 'address payable',
-      },
-    ],
-    outputs: [],
-    stateMutability: 'nonpayable',
-  },
-  {
-    type: 'event',
-    name: 'AccountCreated',
-    inputs: [
-      {
         name: 'proxy',
         type: 'address',
-        indexed: true,
-        internalType: 'address',
       },
       {
+        indexed: false,
+        internalType: 'bytes32',
         name: 'sender',
         type: 'bytes32',
-        indexed: false,
-        internalType: 'bytes32',
       },
       {
+        indexed: false,
+        internalType: 'bytes32',
         name: 'salt',
         type: 'bytes32',
-        indexed: false,
-        internalType: 'bytes32',
       },
     ],
-    anonymous: false,
+    name: 'AccountCreated',
+    type: 'event',
   },
   {
-    type: 'event',
-    name: 'FactoryDeployed',
+    anonymous: false,
     inputs: [
       {
+        indexed: true,
+        internalType: 'address',
         name: 'factory',
         type: 'address',
-        indexed: true,
-        internalType: 'address',
       },
       {
+        indexed: false,
+        internalType: 'address',
         name: 'accountImplementation',
         type: 'address',
-        indexed: false,
-        internalType: 'address',
       },
       {
+        indexed: false,
+        internalType: 'address',
         name: 'entryPoint',
         type: 'address',
-        indexed: false,
-        internalType: 'address',
       },
     ],
-    anonymous: false,
+    name: 'FactoryDeployed',
+    type: 'event',
   },
   {
-    type: 'event',
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: 'address',
+        name: 'previousOwner',
+        type: 'address',
+      },
+      {
+        indexed: true,
+        internalType: 'address',
+        name: 'newOwner',
+        type: 'address',
+      },
+    ],
     name: 'OwnershipTransferStarted',
-    inputs: [
-      {
-        name: 'previousOwner',
-        type: 'address',
-        indexed: true,
-        internalType: 'address',
-      },
-      {
-        name: 'newOwner',
-        type: 'address',
-        indexed: true,
-        internalType: 'address',
-      },
-    ],
-    anonymous: false,
-  },
-  {
     type: 'event',
-    name: 'OwnershipTransferred',
+  },
+  {
+    anonymous: false,
     inputs: [
       {
+        indexed: true,
+        internalType: 'address',
         name: 'previousOwner',
         type: 'address',
-        indexed: true,
-        internalType: 'address',
       },
       {
+        indexed: true,
+        internalType: 'address',
         name: 'newOwner',
         type: 'address',
-        indexed: true,
-        internalType: 'address',
       },
     ],
-    anonymous: false,
+    name: 'OwnershipTransferred',
+    type: 'event',
   },
   {
-    type: 'error',
-    name: 'Create2FailedDeployment',
     inputs: [],
-  },
-  {
-    type: 'error',
-    name: 'InvalidInitializationInput',
-    inputs: [],
-  },
-  {
-    type: 'error',
-    name: 'InvalidLength',
-    inputs: [],
-  },
-  {
-    type: 'error',
-    name: 'OwnableInvalidOwner',
-    inputs: [
-      {
-        name: 'owner',
-        type: 'address',
-        internalType: 'address',
-      },
+    name: 'ACCOUNT_IMPLEMENTATION',
+    outputs: [
+      { internalType: 'contract UpgradableMSCA', name: '', type: 'address' },
     ],
+    stateMutability: 'view',
+    type: 'function',
   },
   {
-    type: 'error',
-    name: 'OwnableUnauthorizedAccount',
+    inputs: [],
+    name: 'ENTRY_POINT',
+    outputs: [
+      { internalType: 'contract IEntryPoint', name: '', type: 'address' },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'acceptOwnership',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
     inputs: [
+      { internalType: 'uint32', name: '_unstakeDelaySec', type: 'uint32' },
+    ],
+    name: 'addStake',
+    outputs: [],
+    stateMutability: 'payable',
+    type: 'function',
+  },
+  {
+    inputs: [
+      { internalType: 'bytes32', name: '_sender', type: 'bytes32' },
+      { internalType: 'bytes32', name: '_salt', type: 'bytes32' },
+      { internalType: 'bytes', name: '_initializingData', type: 'bytes' },
+    ],
+    name: 'createAccount',
+    outputs: [
       {
+        internalType: 'contract UpgradableMSCA',
         name: 'account',
         type: 'address',
-        internalType: 'address',
       },
     ],
+    stateMutability: 'nonpayable',
+    type: 'function',
   },
   {
-    type: 'error',
-    name: 'PluginIsNotAllowed',
+    inputs: [
+      { internalType: 'bytes32', name: '_sender', type: 'bytes32' },
+      { internalType: 'bytes32', name: '_salt', type: 'bytes32' },
+      { internalType: 'bytes', name: '_initializingData', type: 'bytes' },
+    ],
+    name: 'getAddress',
+    outputs: [
+      { internalType: 'address', name: 'addr', type: 'address' },
+      { internalType: 'bytes32', name: 'mixedSalt', type: 'bytes32' },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [{ internalType: 'address', name: '', type: 'address' }],
+    name: 'isPluginAllowed',
+    outputs: [{ internalType: 'bool', name: '', type: 'bool' }],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'owner',
+    outputs: [{ internalType: 'address', name: '', type: 'address' }],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'pendingOwner',
+    outputs: [{ internalType: 'address', name: '', type: 'address' }],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'renounceOwnership',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [
+      { internalType: 'address[]', name: '_plugins', type: 'address[]' },
+      { internalType: 'bool[]', name: '_permissions', type: 'bool[]' },
+    ],
+    name: 'setPlugins',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [{ internalType: 'address', name: 'newOwner', type: 'address' }],
+    name: 'transferOwnership',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'unlockStake',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
     inputs: [
       {
-        name: 'plugin',
+        internalType: 'address payable',
+        name: '_withdrawAddress',
         type: 'address',
-        internalType: 'address',
       },
     ],
+    name: 'withdrawStake',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
   },
 ] as const

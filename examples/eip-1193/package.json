@@ -1,5 +1,5 @@
 {
-  "name": "example-circle-smart-account",
+  "name": "eip-1193-web3js",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -10,7 +10,8 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "viem": "^2.21.27",
-    "@circle-fin/modular-wallets-core": "^1.x.x"
+    "@circle-fin/modular-wallets-core": "^1.x.x",
+    "web3": "^4.16.0"
   },
   "devDependencies": {
     "@types/react": "^18.0.27",
