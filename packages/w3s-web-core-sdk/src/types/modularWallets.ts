@@ -120,3 +120,17 @@ export interface ModularWallet {
  * The Get Circle modular wallet address response.
  */
 export type GetAddressReturnType = ModularWallet
+
+/**
+ * The return type for encodeTransfer.
+ */
+export interface EncodeTransferReturnType {
+  /**
+   * The encoded data.
+   */
+  data: Hex
+  /**
+   * The token address.
+   */
+  to: Hex
+}

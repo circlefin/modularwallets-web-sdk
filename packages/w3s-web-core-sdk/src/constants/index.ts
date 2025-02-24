@@ -16,5 +16,6 @@
  * limitations under the License.
  */
 
+export * from './contractAddress'
 export * from './provider'
 export * from './smartAccount'
