@@ -17,6 +17,7 @@
  */
 
 export * from './address'
+export * from './encoding'
 export * from './mock'
 export * from './publicKey'
 export * from './rpc'

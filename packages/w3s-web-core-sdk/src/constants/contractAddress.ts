@@ -16,7 +16,12 @@
  * limitations under the License.
  */
 
-export * from './accounts'
-export * from './clients'
-export * from './providers'
-export * from './utils'
+export enum ContractAddress {
+  Arbitrum_USDC = '0xaf88d065e77c8cC2239327C5EDb3A432268e5831',
+  Arbitrum_ARB = '0x912CE59144191C1204E64559FE8253a0e49E6548',
+  ArbitrumSepolia_USDC = '0x75faf114eafb1BDbe2F0316DF893fd58CE46AA4d',
+
+  // Polygon Tokens
+  Polygon_USDC = '0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359',
+  PolygonAmoy_USDC = '0x41e94eb019c0762f9bfcf9fb1e58725bfb0e7582',
+}

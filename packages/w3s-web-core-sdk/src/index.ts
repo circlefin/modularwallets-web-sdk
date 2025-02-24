@@ -25,8 +25,14 @@ export * from './actions'
 // Clients
 export * from './clients'
 
+// Constants
+export { ContractAddress } from './constants'
+
 // Providers
 export * from './providers'
+
+// Utils
+export { encodeTransfer } from './utils'
 
 // Types
 export {
