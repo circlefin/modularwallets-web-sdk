@@ -139,6 +139,13 @@ export const CredentialMock: PublicKeyCredential = {
   getClientExtensionResults: () => {
     return {}
   },
+  toJSON: () => {
+    return {
+      id: '60FWjcTS4VlBO1BOPwrWKw',
+      type: 'public-key',
+      rawId: '60FWjcTS4VlBO1BOPwrWKw',
+    }
+  },
 }
 
 export const RegistrationCredentialMock: PublicKeyCredential = {

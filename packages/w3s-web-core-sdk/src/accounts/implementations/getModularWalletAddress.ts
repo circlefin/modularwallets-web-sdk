@@ -16,10 +16,13 @@
  * limitations under the License.
  */
 
-import { getPublicKeyParamsFromOwner } from '../../utils'
+import { type GetAddressReturnType } from '../../types'
+
+import { getDefaultWalletName } from './getDefaultWalletName'
+import { getOwnersConfigFromOwner } from './getOwnersConfigFromOwner'
 
 import type { CircleModularWalletClient } from '../../clients'
-import type { GetAddressReturnType } from '../../types'
+import type { LocalAccount } from 'viem'
 import type { WebAuthnAccount } from 'viem/_types/account-abstraction'
 
 interface GetCircleSmartAccountAddressParameters {
@@ -30,7 +33,7 @@ interface GetCircleSmartAccountAddressParameters {
   /**
    * The owner.
    */
-  owner: WebAuthnAccount
+  owner: WebAuthnAccount | LocalAccount
   /**
    * The Circle Smart Account Wallet Name.
    */
@@ -45,24 +48,15 @@ interface GetCircleSmartAccountAddressParameters {
 export async function getModularWalletAddress({
   client,
   owner,
-  name = `passkey-${new Date().toISOString()}`,
+  name = getDefaultWalletName(owner),
 }: GetCircleSmartAccountAddressParameters): Promise<GetAddressReturnType> {
-  const { initialPublicKeyOwners } = getPublicKeyParamsFromOwner(owner)
-  const publicKeyX = initialPublicKeyOwners[0].x.toString()
-  const publicKeyY = initialPublicKeyOwners[0].y.toString()
-
+  const ownerConfig = getOwnersConfigFromOwner(owner)
   return await client.getAddress([
     {
       scaConfiguration: {
         initialOwnershipConfiguration: {
           weightedMultisig: {
-            webauthnOwners: [
-              {
-                publicKeyX,
-                publicKeyY,
-                weight: 1,
-              },
-            ],
+            ...ownerConfig,
             thresholdWeight: 1,
           },
         },

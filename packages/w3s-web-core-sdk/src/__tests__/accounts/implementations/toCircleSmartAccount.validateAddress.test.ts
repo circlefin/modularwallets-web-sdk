@@ -18,12 +18,15 @@
 
 import { createPublicClient } from 'viem'
 import { toWebAuthnAccount } from 'viem/account-abstraction'
+import { privateKeyToAccount } from 'viem/accounts'
 import { sepolia } from 'viem/chains'
 
 import {
   GetAddressResult,
   GetAddressResultForValidationError,
+  getMockOwners,
   LoginCredentialMock,
+  MockEoaAccount,
   toModularTransport,
   toPasskeyTransport,
 } from '../../../__mocks__'
@@ -32,12 +35,13 @@ import {
   toCircleSmartAccount,
   toWebAuthnCredential,
 } from '../../../accounts'
-import { WebAuthnMode } from '../../../types'
+import { WebAuthnMode, AccountType } from '../../../types'
 
 import type {
   ToWebAuthnAccountParameters,
   WebAuthnCredential,
 } from '../../../types'
+import type { LocalAccount } from 'viem'
 import type { WebAuthnAccount } from 'viem/account-abstraction'
 
 const mockNavigatorGet = globalThis.window.navigator.credentials[
@@ -52,11 +56,17 @@ const loginParameters: ToWebAuthnAccountParameters = {
 
 let credential: WebAuthnCredential
 let owner: WebAuthnAccount
+let localOwner: LocalAccount
+const owners = getMockOwners({
+  [AccountType.WebAuthn]: () => owner,
+  [AccountType.Local]: () => localOwner,
+})
 
 beforeAll(async () => {
   mockNavigatorGet.mockResolvedValue(LoginCredentialMock)
   credential = await toWebAuthnCredential(loginParameters)
   owner = toWebAuthnAccount({ credential })
+  localOwner = privateKeyToAccount(MockEoaAccount.privateKey)
 })
 
 jest.mock('../../../accounts/implementations/getModularWalletAddress', () => ({
@@ -69,39 +79,56 @@ describe('Accounts > implementations > toCircleSmartAccount > address validation
       typeof getModularWalletAddress
     >
 
-  it('should return the client instance if the addresses match', async () => {
-    mockedGetModularWalletAddress.mockResolvedValueOnce(GetAddressResult)
+  it.each(owners)(
+    'should return the client instance if the addresses match $description',
+    async ({ getOwner }) => {
+      expect(getOwner()).toBeDefined()
+      const owner = getOwner()
+      mockedGetModularWalletAddress.mockResolvedValueOnce(
+        GetAddressResult[owner.type],
+      )
 
-    const transport = toModularTransport()
-    const client = createPublicClient({
-      transport,
-      chain: sepolia,
-    })
+      const transport = toModularTransport({
+        accountType: owner.type as AccountType,
+      })
+      const client = createPublicClient({
+        transport,
+        chain: sepolia,
+      })
 
-    const circleSmartAccount = await toCircleSmartAccount({
-      client,
-      owner,
-    })
-
-    expect(circleSmartAccount).toBeDefined()
-  })
-
-  it('should throw an error if the addresses do not match', async () => {
-    mockedGetModularWalletAddress.mockResolvedValueOnce(
-      GetAddressResultForValidationError,
-    )
-
-    const transport = toModularTransport()
-    const client = createPublicClient({
-      transport,
-      chain: sepolia,
-    })
-
-    await expect(
-      toCircleSmartAccount({
+      const circleSmartAccount = await toCircleSmartAccount({
         client,
         owner,
-      }),
-    ).rejects.toThrow('Address mismatch')
-  })
+      })
+
+      expect(circleSmartAccount).toBeDefined()
+    },
+  )
+
+  it.each(owners)(
+    'should throw an error if the addresses do not match $description',
+    async ({ getOwner }) => {
+      mockedGetModularWalletAddress.mockResolvedValueOnce(
+        GetAddressResultForValidationError,
+      )
+
+      expect(getOwner()).toBeDefined()
+      const owner = getOwner()
+
+      const transport = toModularTransport({
+        accountType: owner.type as AccountType,
+      })
+      const client = createPublicClient({
+        transport,
+        chain: sepolia,
+      })
+
+      await expect(
+        toCircleSmartAccount({
+          client,
+          owner,
+        }),
+      ).rejects.toThrow('Address mismatch')
+    },
+  )
 })

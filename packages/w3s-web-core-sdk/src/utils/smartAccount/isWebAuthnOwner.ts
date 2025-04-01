@@ -16,6 +16,16 @@
  * limitations under the License.
  */
 
-export * from './getMinimumVerificationGasLimit'
-export * from './isWebAuthnOwner'
-export * from './walletClientToLocalAccount'
+import { AccountType } from '../../types'
+
+import type { LocalAccount } from 'viem'
+import type { WebAuthnAccount } from 'viem/_types/account-abstraction'
+
+/**
+ * Checks if the owner is a WebAuthnAccount.
+ * @param owner - The account owner to check.
+ * @returns `true` if the owner is a WebAuthnAccount, otherwise `false`.
+ */
+export function isWebAuthnOwner(owner: WebAuthnAccount | LocalAccount) {
+  return owner.type === AccountType.WebAuthn
+}

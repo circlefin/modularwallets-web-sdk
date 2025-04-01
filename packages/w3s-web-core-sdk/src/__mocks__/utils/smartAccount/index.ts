@@ -16,6 +16,4 @@
  * limitations under the License.
  */
 
-export * from './getMinimumVerificationGasLimit'
-export * from './isWebAuthnOwner'
-export * from './walletClientToLocalAccount'
+export * from './walletClientToLocalAccount.Mock'

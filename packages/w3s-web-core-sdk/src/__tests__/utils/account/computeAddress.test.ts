@@ -18,35 +18,54 @@
 
 import { encodeAbiParameters, keccak256 } from 'viem'
 import { toWebAuthnAccount } from 'viem/account-abstraction'
+import { privateKeyToAccount } from 'viem/accounts'
 
 import {
+  getMockOwners,
   LoginCredentialMock,
   MockComputedAddressResult,
+  MockEoaAccount,
   MockPublicKey,
   toPasskeyTransport,
 } from '../../../__mocks__'
 import { toWebAuthnCredential } from '../../../accounts'
-import { WebAuthnMode } from '../../../types'
+import { AccountType, WebAuthnMode } from '../../../types'
 import { computeAddress, getPublicKeyParamsFromOwner } from '../../../utils'
+
+import type { LocalAccount } from 'viem'
+import type { WebAuthnAccount } from 'viem/account-abstraction'
 
 jest.mock('../../../utils/address/getPublicKeyParamsFromOwner', () => ({
   getPublicKeyParamsFromOwner: jest.fn(),
 }))
 
+let owner: WebAuthnAccount
+let localOwner: LocalAccount
+
+beforeAll(async () => {
+  const transport = toPasskeyTransport()
+  jest
+    .spyOn(window.navigator.credentials, 'get')
+    .mockResolvedValueOnce(LoginCredentialMock)
+  const credential = await toWebAuthnCredential({
+    transport,
+    mode: WebAuthnMode.Login,
+  })
+  owner = toWebAuthnAccount({ credential })
+  localOwner = privateKeyToAccount(MockEoaAccount.privateKey)
+})
+
+const owners = getMockOwners({
+  [AccountType.WebAuthn]: () => owner,
+  [AccountType.Local]: () => localOwner,
+})
+
 describe('Utils > account > computeAddress', () => {
-  it('should return the correct address', async () => {
-    const passkeyTransport = toPasskeyTransport()
-
-    jest
-      .spyOn(window.navigator.credentials, 'get')
-      .mockResolvedValueOnce(LoginCredentialMock)
-    const credential = await toWebAuthnCredential({
-      transport: passkeyTransport,
-      mode: WebAuthnMode.Login,
-    })
-    const owner = toWebAuthnAccount({ credential })
-
-    ;(getPublicKeyParamsFromOwner as jest.Mock).mockReturnValue({
+  it('should return the correct address with WebAuthnAccount', () => {
+    const accountType = AccountType.WebAuthn
+    const getPublicKeyParamsFromOwnerMock =
+      getPublicKeyParamsFromOwner as jest.Mock
+    getPublicKeyParamsFromOwnerMock.mockReturnValue({
       sender: keccak256(
         encodeAbiParameters(
           [
@@ -58,7 +77,38 @@ describe('Utils > account > computeAddress', () => {
       ),
       initialPublicKeyOwners: MockPublicKey,
     })
-
-    expect(computeAddress(owner)).toBe(MockComputedAddressResult)
+    expect(computeAddress(owner)).toBe(MockComputedAddressResult[accountType])
   })
+
+  it('should return the correct address with LocalAccount', () => {
+    const accountType = AccountType.Local
+    const owner = localOwner
+
+    expect(computeAddress(owner)).toBe(MockComputedAddressResult[accountType])
+  })
+
+  it.each(owners)(
+    'should return the correct address $description',
+    ({ getOwner }) => {
+      expect(getOwner()).toBeDefined()
+      const owner = getOwner()
+
+      const getPublicKeyParamsFromOwnerMock =
+        getPublicKeyParamsFromOwner as jest.Mock
+      getPublicKeyParamsFromOwnerMock.mockReturnValue({
+        sender: keccak256(
+          encodeAbiParameters(
+            [
+              { name: 'x', type: 'uint256' },
+              { name: 'y', type: 'uint256' },
+            ],
+            [MockPublicKey[0].x, MockPublicKey[0].y],
+          ),
+        ),
+        initialPublicKeyOwners: MockPublicKey,
+      })
+
+      expect(computeAddress(owner)).toBe(MockComputedAddressResult[owner.type])
+    },
+  )
 })

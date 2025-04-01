@@ -16,6 +16,26 @@
  * limitations under the License.
  */
 
-export * from './getMinimumVerificationGasLimit'
-export * from './isWebAuthnOwner'
-export * from './walletClientToLocalAccount'
+import type { TransactionRequestBase, TransactionRequestEIP1559 } from 'viem'
+
+/**
+ * Mocks for the utility function - walletClientToLocalAccount.
+ */
+const base = {
+  from: '0x0000000000000000000000000000000000000000',
+  gas: 21000n,
+  nonce: 785,
+} satisfies TransactionRequestBase
+
+/**
+ * Mocks for the utility function - walletClientToLocalAccount.
+ */
+const baseEip1559 = {
+  ...base,
+  type: 'eip1559',
+} as const satisfies TransactionRequestEIP1559
+
+/**
+ * Mocks for the utility function - walletClientToLocalAccount.
+ */
+export const MockSignTransactionParams = baseEip1559

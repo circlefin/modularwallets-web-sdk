@@ -15,32 +15,37 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 import * as viem from 'viem'
+import { createWalletClient } from 'viem'
 import {
   createBundlerClient,
   toWebAuthnAccount,
 } from 'viem/account-abstraction'
-import { sepolia } from 'viem/chains'
+import { type LocalAccount, privateKeyToAccount } from 'viem/accounts'
+import { mainnet, sepolia } from 'viem/chains'
 
 import {
   FactoryArgsDeployedResult,
   FactoryArgsNotDeployResult,
+  getMockOwners,
   LoginCredentialMock,
   MockCircleSmartAccountAddress,
   MockEncodeCallsEmptyCallsResult,
   MockEncodeCallsExecuteBatchResult,
   MockEncodeCallsExecuteResult,
   MockEncodeCallsParams,
+  MockEoaAccount,
   MockGetAddressResult,
   MockGetAddressResultWithParameter,
   MockSignMessageParams,
   MockSignMessageResult,
   MockSignParams,
-  MockSignResult,
   MockSignTypedDataParams,
   MockSignTypedDataResult,
   MockSignUserOperationParams,
   MockSignUserOperationResult,
+  MockSignResult,
   toModularTransport,
   toPasskeyTransport,
 } from '../../../__mocks__'
@@ -51,330 +56,487 @@ import {
   SEPOLIA_MINIMUM_VERIFICATION_GAS_LIMIT,
   STUB_SIGNATURE,
 } from '../../../constants'
-import { WebAuthnMode } from '../../../types'
+import { AccountType, WebAuthnMode } from '../../../types'
 import {
   getInitializeUpgradableMSCAParams,
-  getJsonRpcStringifyResponse,
-  getPublicKeyParamsFromOwner,
   getSalt,
+  walletClientToLocalAccount,
 } from '../../../utils'
+import { getSenderForContract } from '../../../utils/address/getSenderForContract'
 
 import type {
   ToWebAuthnAccountParameters,
   WebAuthnCredential,
 } from '../../../types'
-import type { WebAuthnAccount } from 'viem/account-abstraction'
+import type { WalletClient } from 'viem'
+import type { BundlerClient, WebAuthnAccount } from 'viem/account-abstraction'
 
 const mockNavigatorGet = globalThis.window.navigator.credentials[
   'get'
 ] as jest.Mock
 
 const passkeyTransport = toPasskeyTransport()
-const modularTransport = toModularTransport()
 const loginParameters: ToWebAuthnAccountParameters = {
   transport: passkeyTransport,
   mode: WebAuthnMode.Login,
 }
 
-const client = createBundlerClient({
-  transport: modularTransport,
-  chain: sepolia,
-})
+const localTransport = toModularTransport({ accountType: AccountType.Local })
+const client: Record<string, BundlerClient> = {
+  [AccountType.WebAuthn]: createBundlerClient({
+    transport: toModularTransport({ accountType: AccountType.WebAuthn }),
+    chain: sepolia,
+  }),
+  [AccountType.Local]: createBundlerClient({
+    transport: localTransport,
+    chain: sepolia,
+  }),
+}
 
 let credential: WebAuthnCredential
 let owner: WebAuthnAccount
+let localOwner: LocalAccount
+let walletClient: WalletClient
+
+const owners = getMockOwners({
+  [AccountType.WebAuthn]: () => owner,
+  [AccountType.Local]: () => localOwner,
+})
 
 beforeAll(async () => {
   mockNavigatorGet.mockResolvedValue(LoginCredentialMock)
   credential = await toWebAuthnCredential(loginParameters)
   owner = toWebAuthnAccount({ credential })
+  localOwner = privateKeyToAccount(MockEoaAccount.privateKey)
+  walletClient = createWalletClient({
+    account: localOwner,
+    chain: mainnet,
+    transport: localTransport,
+  })
 })
 
 describe('Accounts > implementations > toCircleSmartAccount', () => {
   describe('return value: encodeCalls', () => {
-    it('should return mock result for execute', async () => {
-      const account = await toCircleSmartAccount({
-        client,
-        owner,
-      })
+    it.each(owners)(
+      'should return mock result for execute $description',
+      async ({ getOwner }) => {
+        expect(getOwner()).toBeDefined()
+        const owner = getOwner()
+        const account = await toCircleSmartAccount({
+          client: client[owner.type],
+          owner,
+        })
 
-      const encodedData = await account.encodeCalls([MockEncodeCallsParams[0]])
+        const encodedData = await account.encodeCalls([
+          MockEncodeCallsParams[0],
+        ])
+        expect(encodedData).toBe(MockEncodeCallsExecuteResult[owner.type])
+      },
+    )
 
-      expect(encodedData).toBe(MockEncodeCallsExecuteResult)
-    })
+    it.each(owners)(
+      'should return mock result for executeBatch $description',
+      async ({ getOwner }) => {
+        expect(getOwner()).toBeDefined()
+        const owner = getOwner()
+        const account = await toCircleSmartAccount({
+          client: client[owner.type],
+          owner,
+        })
 
-    it('should return mock result for executeBatch', async () => {
-      const account = await toCircleSmartAccount({
-        client,
-        owner,
-      })
+        const encodedData = await account.encodeCalls(MockEncodeCallsParams)
+        expect(encodedData).toBe(MockEncodeCallsExecuteBatchResult)
+      },
+    )
 
-      const encodedData = await account.encodeCalls(MockEncodeCallsParams)
+    it.each(owners)(
+      'should return mock result when the `calls` parameter is an empty array $description',
+      async ({ getOwner }) => {
+        expect(getOwner()).toBeDefined()
+        const owner = getOwner()
+        const account = await toCircleSmartAccount({
+          client: client[owner.type],
+          owner,
+        })
 
-      expect(encodedData).toBe(MockEncodeCallsExecuteBatchResult)
-    })
+        const encodedData = await account.encodeCalls([])
 
-    it('should return mock result when the `calls` parameter is an empty array', async () => {
-      const account = await toCircleSmartAccount({
-        client,
-        owner,
-      })
+        expect(encodedData).toBe(MockEncodeCallsEmptyCallsResult)
+      },
+    )
 
-      const encodedData = await account.encodeCalls([])
+    describe('return value: getFactoryArgs', () => {
+      it.each(owners)(
+        'should return mock factory args if the smart account has not been deployed $description',
+        async ({ getOwner }) => {
+          expect(getOwner()).toBeDefined()
+          const owner = getOwner()
+          const account = await toCircleSmartAccount({
+            client: client[owner.type],
+            owner,
+          })
 
-      expect(encodedData).toBe(MockEncodeCallsEmptyCallsResult)
-    })
-  })
+          account.isDeployed = jest.fn().mockResolvedValue(false)
+          const encodeFunctionDataSpy = jest.spyOn(viem, 'encodeFunctionData')
 
-  describe('return value: getFactoryArgs', () => {
-    it('should return mock factory args if the smart account has not been deployed', async () => {
-      const account = await toCircleSmartAccount({
-        client,
-        owner,
-      })
+          const factoryArgs = await account.getFactoryArgs()
 
-      account.isDeployed = jest.fn().mockResolvedValue(false)
-      const encodeFunctionDataSpy = jest.spyOn(viem, 'encodeFunctionData')
+          const sender = getSenderForContract(owner)
+          const salt = getSalt()
+          const initializeUpgradableMSCAParams =
+            getInitializeUpgradableMSCAParams(owner)
 
-      const factoryArgs = await account.getFactoryArgs()
-
-      const { sender } = getPublicKeyParamsFromOwner(owner)
-      const salt = getSalt()
-      const initializeUpgradableMSCAParams =
-        getInitializeUpgradableMSCAParams(owner)
-
-      expect(encodeFunctionDataSpy).toHaveBeenCalledWith({
-        abi: factory.abi,
-        functionName: 'createAccount',
-        args: [sender, salt, initializeUpgradableMSCAParams],
-      })
-      expect(factoryArgs).toEqual(FactoryArgsNotDeployResult)
-    })
-
-    it('should return mock factory args if the smart account has been deployed', async () => {
-      const account = await toCircleSmartAccount({
-        client,
-        owner,
-      })
-      account.isDeployed = jest.fn().mockResolvedValue(true)
-
-      const factoryArgs = await account.getFactoryArgs()
-
-      expect(factoryArgs).toEqual(FactoryArgsDeployedResult)
-    })
-  })
-
-  describe('return value: getStubSignature', () => {
-    it('should return mock result', async () => {
-      const account = await toCircleSmartAccount({
-        client,
-        owner,
-      })
-
-      const stubSignature = await account.getStubSignature()
-
-      expect(stubSignature).toBe(STUB_SIGNATURE)
-    })
-  })
-
-  describe('return value: getAddress', () => {
-    it('should return mock address', async () => {
-      const account = await toCircleSmartAccount({
-        client,
-        owner,
-      })
-
-      const address = await account.getAddress()
-
-      expect(address).toBe(MockGetAddressResult)
-    })
-
-    it('should return mock address from parameter', async () => {
-      const account = await toCircleSmartAccount({
-        address: MockCircleSmartAccountAddress,
-        client,
-        owner,
-      })
-
-      const address = await account.getAddress()
-
-      expect(address).toBe(MockGetAddressResultWithParameter)
-    })
-  })
-
-  describe('return value: sign', () => {
-    it('should return mock result', async () => {
-      fetchMock.mockResponseOnce(getJsonRpcStringifyResponse(MockSignResult))
-
-      const account = await toCircleSmartAccount({
-        client,
-        owner,
-      })
-
-      const signature = await account.sign(MockSignParams)
-
-      expect(signature).toBe(MockSignResult)
-
-      fetchMock.resetMocks()
-    })
-  })
-
-  describe('return value: signTypedData', () => {
-    it('should return mock result', async () => {
-      const account = await toCircleSmartAccount({
-        client,
-        owner,
-      })
-
-      const signature = await account.signTypedData(MockSignTypedDataParams)
-
-      expect(signature).toBe(MockSignTypedDataResult)
-    })
-  })
-
-  describe('return value: signUserOperation', () => {
-    it('should return mock result', async () => {
-      const account = await toCircleSmartAccount({
-        client,
-        owner,
-      })
-
-      const signature = await account.signUserOperation(
-        MockSignUserOperationParams,
+          expect(encodeFunctionDataSpy).toHaveBeenCalledWith({
+            abi: factory.abi,
+            functionName: 'createAccount',
+            args: [sender, salt, initializeUpgradableMSCAParams],
+          })
+          expect(factoryArgs.factory?.toLowerCase()).toEqual(
+            FactoryArgsNotDeployResult[owner.type].factory.toLowerCase(),
+          )
+          expect(factoryArgs.factoryData?.toLocaleLowerCase()).toEqual(
+            FactoryArgsNotDeployResult[
+              owner.type
+            ].factoryData?.toLocaleLowerCase(),
+          )
+        },
       )
 
-      expect(signature).toBe(MockSignUserOperationResult)
-    })
-  })
+      it.each(owners)(
+        'should return mock factory args if the smart account has been deployed $description',
+        async ({ getOwner }) => {
+          const owner = getOwner()
+          const account = await toCircleSmartAccount({
+            client: client[owner.type],
+            owner,
+          })
+          account.isDeployed = jest.fn().mockResolvedValue(true)
 
-  describe('return value: signMessage', () => {
-    it('should return mock result', async () => {
-      const account = await toCircleSmartAccount({
-        client,
-        owner,
-      })
+          const factoryArgs = await account.getFactoryArgs()
 
-      const signature = await account.signMessage(MockSignMessageParams)
-
-      expect(signature).toBe(MockSignMessageResult)
-    })
-  })
-
-  describe('return value: userOperation.estimateGas', () => {
-    beforeEach(() => {
-      fetchMock.enableMocks()
-    })
-
-    afterEach(() => {
-      fetchMock.resetMocks()
-    })
-
-    it('should return the updated verification gas limit value when the updated value is greater than the minimum value', async () => {
-      const account = await toCircleSmartAccount({
-        client,
-        owner,
-      })
-
-      const mockVerificationGasLimit = 900_000n
-
-      const estimateGas = await account.userOperation?.estimateGas?.({
-        verificationGasLimit: mockVerificationGasLimit,
-      })
-
-      expect(estimateGas?.verificationGasLimit).toBe(
-        BigInt(mockVerificationGasLimit),
+          expect(factoryArgs).toEqual(FactoryArgsDeployedResult)
+        },
       )
     })
 
-    it('should return the minimum verification gas limit value when the updated value is less than the minimum value', async () => {
-      const account = await toCircleSmartAccount({
-        client,
-        owner,
-      })
+    describe('return value: getStubSignature', () => {
+      it.each(owners)(
+        'should return mock result $description',
+        async ({ getOwner }) => {
+          expect(getOwner()).toBeDefined()
+          const owner = getOwner()
+          const account = await toCircleSmartAccount({
+            client: client[owner.type],
+            owner,
+          })
 
-      const estimateGas = await account.userOperation?.estimateGas?.({
-        verificationGasLimit: 0n,
-      })
+          const stubSignature = await account.getStubSignature()
 
-      expect(estimateGas?.verificationGasLimit).toBe(
-        BigInt(SEPOLIA_MINIMUM_VERIFICATION_GAS_LIMIT),
+          expect(stubSignature).toBe(STUB_SIGNATURE)
+        },
       )
     })
 
-    it('should return the minimum verification gas limit when the updated value is undefined', async () => {
-      const account = await toCircleSmartAccount({
-        client,
-        owner,
-      })
+    describe('return value: getAddress', () => {
+      it.each(owners)(
+        'should return mock address $description',
+        async ({ getOwner }) => {
+          expect(getOwner()).toBeDefined()
+          const owner = getOwner()
+          const account = await toCircleSmartAccount({
+            client: client[owner.type],
+            owner,
+          })
 
-      const estimateGas = await account.userOperation?.estimateGas?.({})
+          const address = await account.getAddress()
 
-      expect(estimateGas?.verificationGasLimit).toBe(
-        BigInt(SEPOLIA_MINIMUM_VERIFICATION_GAS_LIMIT),
+          expect(address).toBe(MockGetAddressResult[owner.type])
+        },
       )
-    })
-  })
 
-  describe('return value: userOperation.estimateGas with undeploy smart wallet cases', () => {
-    beforeEach(() => {
-      fetchMock.enableMocks()
+      it.each(owners)(
+        'should return mock address from parameter $description',
+        async ({ getOwner }) => {
+          expect(getOwner()).toBeDefined()
+          const owner = getOwner()
+          const account = await toCircleSmartAccount({
+            address: MockCircleSmartAccountAddress,
+            client: client[owner.type],
+            owner,
+          })
 
-      const mockGetCode = jest.fn().mockResolvedValue('0x')
+          const address = await account.getAddress()
 
-      client.transport.key = 'test' // To bypass the wallet address check
-      client.extend = jest.fn().mockReturnValue({
-        getCode: mockGetCode,
-      })
-    })
-
-    afterEach(() => {
-      fetchMock.resetMocks()
-    })
-
-    it(`should return the minimum undeploy verification gas limit constant when the address hasn't been deployed`, async () => {
-      const account = await toCircleSmartAccount({
-        client,
-        owner,
-      })
-
-      const estimateGas = await account.userOperation?.estimateGas?.({
-        verificationGasLimit: 0n,
-      })
-
-      expect(estimateGas?.verificationGasLimit).toBe(
-        BigInt(SEPOLIA_MINIMUM_UNDEPLOY_VERIFICATION_GAS_LIMIT),
+          expect(address).toBe(MockGetAddressResultWithParameter)
+        },
       )
     })
 
-    it(`should return the minimum undeploy verification gas limit constant when the address hasn't been deployed and the passed-in value is less than the default value`, async () => {
-      const account = await toCircleSmartAccount({
-        client,
-        owner,
+    describe('return value: sign', () => {
+      it.each(owners)(
+        'should return mock result $description',
+        async ({ getOwner }) => {
+          expect(getOwner()).toBeDefined()
+          const owner = getOwner()
+          const account = await toCircleSmartAccount({
+            client: client[owner.type],
+            owner,
+          })
+
+          const signature = await account.sign(MockSignParams[owner.type])
+          expect(signature).toBe(MockSignResult[owner.type])
+        },
+      )
+
+      it('should throw an error when sign with a LocalAccount converted from WalletClient', async () => {
+        const owner = walletClientToLocalAccount(walletClient)
+        const account = await toCircleSmartAccount({
+          client: client[owner.type],
+          owner,
+        })
+        await expect(account.sign(MockSignParams[owner.type])).rejects.toThrow(
+          '`owner` does not support raw sign.',
+        )
+      })
+    })
+
+    describe('return value: signTypedData', () => {
+      it.each(owners)(
+        'should return mock result $description',
+        async ({ getOwner }) => {
+          expect(getOwner()).toBeDefined()
+          const owner = getOwner()
+          const account = await toCircleSmartAccount({
+            client: client[owner.type],
+            owner,
+          })
+
+          const signature = await account.signTypedData(MockSignTypedDataParams)
+
+          expect(signature).toBe(MockSignTypedDataResult[owner.type])
+        },
+      )
+
+      it('should throw an error when signTypedData with a LocalAccount converted from WalletClient', async () => {
+        const owner = walletClientToLocalAccount(walletClient)
+        const account = await toCircleSmartAccount({
+          client: client[owner.type],
+          owner,
+        })
+        await expect(
+          account.signTypedData(MockSignTypedDataParams),
+        ).rejects.toThrow('`owner` does not support raw sign.')
+      })
+    })
+
+    describe('return value: signUserOperation', () => {
+      it.each(owners)(
+        'should return mock result $description',
+        async ({ getOwner }) => {
+          expect(getOwner()).toBeDefined()
+          const owner = getOwner()
+          const account = await toCircleSmartAccount({
+            client: client[owner.type],
+            owner,
+          })
+
+          const signature = await account.signUserOperation(
+            MockSignUserOperationParams,
+          )
+
+          expect(signature).toBe(MockSignUserOperationResult[owner.type])
+        },
+      )
+
+      it('should return mock result with a LocalAccount converted from WalletClient', async () => {
+        const owner = walletClientToLocalAccount(walletClient)
+        const account = await toCircleSmartAccount({
+          client: client[owner.type],
+          owner,
+        })
+        const signature = await account.signUserOperation(
+          MockSignUserOperationParams,
+        )
+
+        expect(signature).toBe(MockSignUserOperationResult[owner.type])
+      })
+    })
+
+    describe('return value: signMessage', () => {
+      it.each(owners)(
+        'should return mock result $description',
+        async ({ getOwner }) => {
+          expect(getOwner()).toBeDefined()
+          const owner = getOwner()
+          const account = await toCircleSmartAccount({
+            client: client[owner.type],
+            owner,
+          })
+
+          const signature = await account.signMessage(MockSignMessageParams)
+
+          expect(signature).toBe(MockSignMessageResult[owner.type])
+        },
+      )
+
+      it('should throw an error when signMessage with a LocalAccount converted from WalletClient', async () => {
+        const owner = walletClientToLocalAccount(walletClient)
+        const account = await toCircleSmartAccount({
+          client: client[owner.type],
+          owner,
+        })
+        await expect(
+          account.signMessage(MockSignMessageParams),
+        ).rejects.toThrow('`owner` does not support raw sign.')
+      })
+    })
+
+    describe('return value: userOperation.estimateGas', () => {
+      beforeEach(() => {
+        fetchMock.enableMocks()
       })
 
-      const estimateGas = await account.userOperation?.estimateGas?.({
-        verificationGasLimit: 0n,
+      afterEach(() => {
+        fetchMock.resetMocks()
       })
 
-      expect(estimateGas?.verificationGasLimit).toBe(
-        BigInt(SEPOLIA_MINIMUM_UNDEPLOY_VERIFICATION_GAS_LIMIT),
+      it.each(owners)(
+        'should return the updated verification gas limit value when the updated value is greater than the minimum value $description',
+        async ({ getOwner }) => {
+          expect(getOwner()).toBeDefined()
+          const owner = getOwner()
+          const account = await toCircleSmartAccount({
+            client: client[owner.type],
+            owner,
+          })
+
+          const mockVerificationGasLimit = 900_000n
+
+          const estimateGas = await account.userOperation?.estimateGas?.({
+            verificationGasLimit: mockVerificationGasLimit,
+          })
+
+          expect(estimateGas?.verificationGasLimit).toBe(
+            BigInt(mockVerificationGasLimit),
+          )
+        },
+      )
+
+      it.each(owners)(
+        'should return the minimum verification gas limit value when the updated value is less than the minimum value $description',
+        async ({ getOwner }) => {
+          expect(getOwner()).toBeDefined()
+          const owner = getOwner()
+          const account = await toCircleSmartAccount({
+            client: client[owner.type],
+            owner,
+          })
+
+          const estimateGas = await account.userOperation?.estimateGas?.({
+            verificationGasLimit: 0n,
+          })
+
+          expect(estimateGas?.verificationGasLimit).toBe(
+            BigInt(SEPOLIA_MINIMUM_VERIFICATION_GAS_LIMIT),
+          )
+        },
+      )
+
+      it.each(owners)(
+        'should return the minimum verification gas limit when the updated value is undefined $description',
+        async ({ getOwner }) => {
+          expect(getOwner()).toBeDefined()
+          const owner = getOwner()
+          const account = await toCircleSmartAccount({
+            client: client[owner.type],
+            owner,
+          })
+
+          const estimateGas = await account.userOperation?.estimateGas?.({})
+
+          expect(estimateGas?.verificationGasLimit).toBe(
+            BigInt(SEPOLIA_MINIMUM_VERIFICATION_GAS_LIMIT),
+          )
+        },
       )
     })
 
-    it(`should return the passed-in verification gas limit value when the address hasn't been deployed and the passed-in value is greater than the default value`, async () => {
-      const account = await toCircleSmartAccount({
-        client,
-        owner,
+    describe('return value: userOperation.estimateGas with undeploy smart wallet cases', () => {
+      beforeEach(() => {
+        fetchMock.enableMocks()
+
+        const mockGetCode = jest.fn().mockResolvedValue('0x')
+        const types: string[] = [AccountType.WebAuthn, AccountType.Local]
+        types.forEach((item, _) => {
+          client[item].transport.key = 'test'
+          client[item].extend = jest.fn().mockReturnValue({
+            getCode: mockGetCode,
+          })
+        })
       })
 
-      const mockVerificationGasLimit = 2_000_000n
-
-      const estimateGas = await account.userOperation?.estimateGas?.({
-        verificationGasLimit: mockVerificationGasLimit,
+      afterEach(() => {
+        fetchMock.resetMocks()
       })
 
-      expect(estimateGas?.verificationGasLimit).toBe(
-        BigInt(mockVerificationGasLimit),
+      it.each(owners)(
+        `should return the minimum $description`,
+        async ({ getOwner }) => {
+          expect(getOwner()).toBeDefined()
+          const owner = getOwner()
+          const account = await toCircleSmartAccount({
+            client: client[owner.type],
+            owner,
+          })
+
+          const estimateGas = await account.userOperation?.estimateGas?.({
+            verificationGasLimit: 0n,
+          })
+          expect(estimateGas?.verificationGasLimit).toBe(
+            BigInt(SEPOLIA_MINIMUM_UNDEPLOY_VERIFICATION_GAS_LIMIT),
+          )
+        },
+      )
+
+      it.each(owners)(
+        `should return the minimum undeploy verification gas limit constant when the address hasn't been deployed and the passed-in value is less than the default value $description`,
+        async ({ getOwner }) => {
+          expect(getOwner()).toBeDefined()
+          const owner = getOwner()
+          const account = await toCircleSmartAccount({
+            client: client[owner.type],
+            owner,
+          })
+          const estimateGas = await account.userOperation?.estimateGas?.({
+            verificationGasLimit: 0n,
+          })
+
+          expect(estimateGas?.verificationGasLimit).toBe(
+            BigInt(SEPOLIA_MINIMUM_UNDEPLOY_VERIFICATION_GAS_LIMIT),
+          )
+        },
+      )
+
+      it.each(owners)(
+        `should return the passed-in verification gas limit value when the address hasn't been deployed and the passed-in value is greater than the default value $description`,
+        async ({ getOwner }) => {
+          expect(getOwner()).toBeDefined()
+          const owner = getOwner()
+          const account = await toCircleSmartAccount({
+            client: client[owner.type],
+            owner,
+          })
+
+          const mockVerificationGasLimit = 2_000_000n
+
+          const estimateGas = await account.userOperation?.estimateGas?.({
+            verificationGasLimit: mockVerificationGasLimit,
+          })
+
+          expect(estimateGas?.verificationGasLimit).toBe(
+            BigInt(mockVerificationGasLimit),
+          )
+        },
       )
     })
   })

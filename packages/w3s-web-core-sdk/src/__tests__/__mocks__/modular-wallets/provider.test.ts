@@ -37,6 +37,7 @@ import {
   MockModularWalletsProvider,
   SendUserOperationResult,
 } from '../../../__mocks__'
+import { AccountType } from '../../../types/modularWallets'
 
 describe('Mocks > providers > modular-wallets > ModularWalletsProvider', () => {
   it('should be defined', () => {
@@ -219,7 +220,7 @@ describe('Mocks > providers > modular-wallets > ModularWalletsProvider > fetchDa
       mockPayload,
     )
 
-    expect(response).toEqual(GetAddressResult)
+    expect(response).toEqual(GetAddressResult[AccountType.WebAuthn])
   })
 
   it('should fetch data successfully and return the correct response for pm_getPaymasterData', async () => {

@@ -18,46 +18,69 @@
 
 import { createPublicClient } from 'viem'
 import { toWebAuthnAccount } from 'viem/account-abstraction'
+import { privateKeyToAccount } from 'viem/accounts'
 import { sepolia } from 'viem/chains'
 
 import {
   GetAddressResult,
+  getMockOwners,
   LoginCredentialMock,
+  MockEoaAccount,
   toModularTransport,
   toPasskeyTransport,
 } from '../../../__mocks__'
 import { toWebAuthnCredential } from '../../../accounts'
 import { getModularWalletAddress } from '../../../accounts/implementations'
 import { toCircleModularWalletClient } from '../../../clients'
-import { WebAuthnMode } from '../../../types'
+import { WebAuthnMode, AccountType } from '../../../types'
+
+import type { LocalAccount } from 'viem'
+import type { WebAuthnAccount } from 'viem/account-abstraction'
+
+let owner: WebAuthnAccount
+let localOwner: LocalAccount
+
+beforeAll(async () => {
+  const transport = toPasskeyTransport()
+  jest
+    .spyOn(window.navigator.credentials, 'get')
+    .mockResolvedValueOnce(LoginCredentialMock)
+  const credential = await toWebAuthnCredential({
+    transport,
+    mode: WebAuthnMode.Login,
+  })
+  owner = toWebAuthnAccount({ credential })
+  localOwner = privateKeyToAccount(MockEoaAccount.privateKey)
+})
+
+const owners = getMockOwners({
+  [AccountType.WebAuthn]: () => owner,
+  [AccountType.Local]: () => localOwner,
+})
 
 describe('Actions > implementations > getModularWalletAddress', () => {
-  it('should return wallet creation result', async () => {
-    const modularTransport = toModularTransport()
-    const client = createPublicClient({
-      transport: modularTransport,
-      chain: sepolia,
-    })
-    const circleModularWalletClient = toCircleModularWalletClient({
-      client,
-    })
+  it.each(owners)(
+    'should return wallet creation result $description',
+    async ({ getOwner }) => {
+      expect(getOwner()).toBeDefined()
+      const owner = getOwner()
+      const transport = toModularTransport({
+        accountType: owner.type as AccountType,
+      })
+      const client = createPublicClient({
+        transport,
+        chain: sepolia,
+      })
+      const circleModularWalletClient = toCircleModularWalletClient({
+        client,
+      })
 
-    const passkeyTransport = toPasskeyTransport()
+      const result = await getModularWalletAddress({
+        client: circleModularWalletClient,
+        owner,
+      })
 
-    jest
-      .spyOn(window.navigator.credentials, 'get')
-      .mockResolvedValueOnce(LoginCredentialMock)
-    const credential = await toWebAuthnCredential({
-      transport: passkeyTransport,
-      mode: WebAuthnMode.Login,
-    })
-    const owner = toWebAuthnAccount({ credential })
-
-    const result = await getModularWalletAddress({
-      client: circleModularWalletClient,
-      owner,
-    })
-
-    expect(result).toEqual(GetAddressResult)
-  })
+      expect(result).toEqual(GetAddressResult[owner.type])
+    },
+  )
 })

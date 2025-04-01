@@ -16,29 +16,30 @@
  * limitations under the License.
  */
 
-import { encodeFunctionData, erc20Abi } from 'viem'
+import {
+  MockInvalidWrappedEoaSignature,
+  MockWrapEoaSignatureParams,
+  MockWrappedSignResult,
+} from '../../../__mocks__'
+import { AccountType } from '../../../types/modularWallets'
+import { wrapEoaSignature } from '../../../utils'
 
-import type { ContractAddress } from '../../constants'
-import type { EncodeTransferReturnType } from '../../types'
 import type { Hex } from 'viem'
 
-/**
- * Encode the ERC20 transfer for user operations.
- * @param to - The recipient address.
- * @param token - The token address you want to transfer.
- * @param amount - The amount to transfer.
- * @returns The encoded transfer.
- */
-export function encodeTransfer(
-  to: Hex,
-  token: ContractAddress | Hex,
-  amount: bigint,
-): EncodeTransferReturnType {
-  const data = encodeFunctionData({
-    abi: erc20Abi,
-    functionName: 'transfer',
-    args: [to, amount],
+describe('Utils > signature > wrapEoaSignature', () => {
+  const signature: Hex = MockWrapEoaSignatureParams
+
+  it('should wrap a valid signature correctly', () => {
+    const result = wrapEoaSignature({ signature })
+
+    expect(result).toEqual(MockWrappedSignResult[AccountType.Local])
   })
 
-  return { data, to: token }
-}
+  it('error: invalid signature', () => {
+    expect(() =>
+      wrapEoaSignature({
+        signature: MockInvalidWrappedEoaSignature,
+      }),
+    ).toThrow('signature is invalid')
+  })
+})

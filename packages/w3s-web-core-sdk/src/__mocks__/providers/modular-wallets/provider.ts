@@ -19,6 +19,7 @@
 import { MethodNotImplementedError } from 'web3-errors'
 
 import { ModularWalletsProvider } from '../../../providers'
+import { AccountType } from '../../../types'
 import { getJsonRpcResponse } from '../../../utils'
 
 import {
@@ -54,8 +55,15 @@ import type {
 export default class MockModularWalletsProvider<
   API extends Web3APISpec = EthExecutionAPI,
 > extends ModularWalletsProvider<API> {
-  public constructor() {
+  private accountType: AccountType
+
+  /**
+   * Creates an instance of MockModularWalletsProvider.
+   * @param accountType - The account type that represents the owner. Default is {@link AccountType.WebAuthn}.
+   */
+  public constructor(accountType: AccountType = AccountType.WebAuthn) {
     super('https://example.com', 'test-client-key')
+    this.accountType = accountType
   }
 
   public async request<
@@ -161,7 +169,7 @@ export default class MockModularWalletsProvider<
         return (
           await getJsonRpcResponse<API, Method, ResultType>(
             payload,
-            GetAddressResult,
+            GetAddressResult[this.accountType],
           )
         ).result
       case 'pm_getPaymasterData':

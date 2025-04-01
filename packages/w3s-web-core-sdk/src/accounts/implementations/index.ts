@@ -19,3 +19,4 @@
 export * from './getModularWalletAddress'
 export * from './toCircleSmartAccount'
 export * from './webAuthnSign'
+export * from './signAndWrap'

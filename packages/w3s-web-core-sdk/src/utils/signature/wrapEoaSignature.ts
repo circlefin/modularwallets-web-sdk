@@ -16,29 +16,32 @@
  * limitations under the License.
  */
 
-import { encodeFunctionData, erc20Abi } from 'viem'
+import { encodePacked, parseSignature } from 'viem'
 
-import type { ContractAddress } from '../../constants'
-import type { EncodeTransferReturnType } from '../../types'
 import type { Hex } from 'viem'
 
-/**
- * Encode the ERC20 transfer for user operations.
- * @param to - The recipient address.
- * @param token - The token address you want to transfer.
- * @param amount - The amount to transfer.
- * @returns The encoded transfer.
- */
-export function encodeTransfer(
-  to: Hex,
-  token: ContractAddress | Hex,
-  amount: bigint,
-): EncodeTransferReturnType {
-  const data = encodeFunctionData({
-    abi: erc20Abi,
-    functionName: 'transfer',
-    args: [to, amount],
-  })
+interface WrapEoaSignatureParameters {
+  /**
+   * The signature to wrap.
+   */
+  signature: Hex
+}
 
-  return { data, to: token }
+/**
+ * Wraps an eoa signature.
+ * @param parameters - Parameters to use. See {@link WrapEoaSignatureParameters}.
+ * @returns The wrapped signature.
+ * @throws Error if the signature is invalid.
+ */
+export function wrapEoaSignature({
+  signature,
+}: WrapEoaSignatureParameters): Hex {
+  const { r, s, v } = parseSignature(signature)
+  if (typeof v !== 'undefined') {
+    return encodePacked(
+      ['bytes32', 'bytes32', 'uint8'],
+      [r, s, Number(v + 32n)],
+    )
+  }
+  throw new Error('signature is invalid')
 }

@@ -16,6 +16,24 @@
  * limitations under the License.
  */
 
-export * from './getMinimumVerificationGasLimit'
-export * from './isWebAuthnOwner'
-export * from './walletClientToLocalAccount'
+import { pad } from 'viem'
+
+import { isWebAuthnOwner } from '../smartAccount'
+
+import { getPublicKeyParamsFromOwner } from './getPublicKeyParamsFromOwner'
+
+import type { Hex, LocalAccount } from 'viem'
+import type { WebAuthnAccount } from 'viem/account-abstraction'
+
+/**
+ * Get the sender formatted for Bytes32 for smart contract interactions.
+ * @param owner - The owner.
+ * @returns The sender.
+ */
+export function getSenderForContract(
+  owner: WebAuthnAccount | LocalAccount,
+): Hex {
+  return isWebAuthnOwner(owner)
+    ? getPublicKeyParamsFromOwner(owner).sender
+    : pad(owner.address)
+}

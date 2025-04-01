@@ -38,6 +38,7 @@ import {
   SendUserOperationResult,
 } from '../../../__mocks__'
 import { ModularWalletsProvider } from '../../../providers'
+import { AccountType } from '../../../types/modularWallets'
 import { getJsonRpcStringifyResponse } from '../../../utils'
 
 const provider = new ModularWalletsProvider(
@@ -270,13 +271,15 @@ describe('Providers > modular-wallets > ModularWalletsProvider > fetchData', () 
   it('should fetch data successfully and return the correct response for circle_getAddress', async () => {
     const mockPayload = { method: 'circle_getAddress', id: 14 }
 
-    fetchMock.mockResponseOnce(getJsonRpcStringifyResponse(GetAddressResult))
+    fetchMock.mockResponseOnce(
+      getJsonRpcStringifyResponse(GetAddressResult[AccountType.WebAuthn]),
+    )
 
     const response = await provider.request<string, typeof GetAddressResult>(
       mockPayload,
     )
 
-    expect(response).toEqual(GetAddressResult)
+    expect(response).toEqual(GetAddressResult[AccountType.WebAuthn])
   })
 
   it('should fetch data successfully and return the correct response for pm_getPaymasterData', async () => {

@@ -16,6 +16,20 @@
  * limitations under the License.
  */
 
-export * from './getMinimumVerificationGasLimit'
-export * from './isWebAuthnOwner'
-export * from './walletClientToLocalAccount'
+import { isWebAuthnOwner } from '../../utils'
+
+import type { LocalAccount } from 'viem'
+import type { WebAuthnAccount } from 'viem/_types/account-abstraction'
+
+/**
+ * Generates a default wallet name based on the owner type.
+ * @param owner - The account owner.
+ * @returns The default wallet name.
+ */
+export function getDefaultWalletName(
+  owner: WebAuthnAccount | LocalAccount,
+): string {
+  return isWebAuthnOwner(owner)
+    ? `passkey-${new Date().toISOString()}`
+    : `wallet-${new Date().toISOString()}`
+}

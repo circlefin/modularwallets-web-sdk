@@ -27,7 +27,7 @@ import {
 import { toWebAuthnCredential } from '../../../accounts'
 import {
   CIRCLE_WEIGHTED_WEB_AUTHN_MULTISIG_PLUGIN,
-  PUBLIC_KEY_OWN_WEIGHTS,
+  OWNER_WEIGHTS,
   THRESHOLD_WEIGHT,
   UPGRADABLE_MSCA,
 } from '../../../constants'
@@ -55,13 +55,7 @@ describe('Utils > account > initializeUpgradableMSCA > getInitializeUpgradableMS
     const { initialPublicKeyOwners } = getPublicKeyParamsFromOwner(owner)
     const pluginInstallParams = encodeAbiParameters(
       CIRCLE_PLUGIN_INSTALL_DATA_ABI,
-      [
-        [],
-        [],
-        initialPublicKeyOwners,
-        PUBLIC_KEY_OWN_WEIGHTS,
-        THRESHOLD_WEIGHT,
-      ],
+      [[], [], initialPublicKeyOwners, OWNER_WEIGHTS, THRESHOLD_WEIGHT],
     )
 
     const expectedEncodedResult = encodeFunctionData({
@@ -96,13 +90,7 @@ describe('Utils > account > initializeUpgradableMSCA > getInitializeUpgradableMS
     const { initialPublicKeyOwners } = getPublicKeyParamsFromOwner(owner)
     const pluginInstallParams = encodeAbiParameters(
       CIRCLE_PLUGIN_INSTALL_DATA_ABI,
-      [
-        [],
-        [],
-        initialPublicKeyOwners,
-        PUBLIC_KEY_OWN_WEIGHTS,
-        THRESHOLD_WEIGHT,
-      ],
+      [[], [], initialPublicKeyOwners, OWNER_WEIGHTS, THRESHOLD_WEIGHT],
     )
 
     const expectedEncodedResult = encodeAbiParameters(

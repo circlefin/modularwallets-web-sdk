@@ -39,22 +39,21 @@ import {
   UPGRADABLE_MSCA as upgradableMsca,
 } from '../../constants'
 import {
+  type ToCircleSmartAccountParameters,
+  type ToCircleSmartAccountReturnType,
+} from '../../types'
+import {
   computeAddress,
   getInitializeUpgradableMSCAParams,
   getMinimumVerificationGasLimit,
-  getPublicKeyParamsFromOwner,
+  getSenderForContract,
   getSalt,
   toReplaySafeHash,
-  wrapSignature,
 } from '../../utils'
 
 import { getModularWalletAddress } from './getModularWalletAddress'
-import { webAuthnSign } from './webAuthnSign'
+import { signAndWrap } from './signAndWrap'
 
-import type {
-  ToCircleSmartAccountParameters,
-  ToCircleSmartAccountReturnType,
-} from '../../types'
 import type { Address, TypedData } from 'abitype'
 import type { Hex, TypedDataDefinition } from 'viem'
 import type { UserOperation } from 'viem/account-abstraction'
@@ -69,10 +68,10 @@ export async function toCircleSmartAccount(
 ): Promise<ToCircleSmartAccountReturnType> {
   const { address, client, owner, name } = parameters
   const publicClient = client.extend(publicActions)
-  const { sender } = getPublicKeyParamsFromOwner(owner)
-  const salt = getSalt()
+  const sender = getSenderForContract(owner)
   const initializeUpgradableMSCAParams =
     getInitializeUpgradableMSCAParams(owner)
+  const salt = getSalt()
   let deployed = false
 
   // Only calls Circle Modular Wallet API if the client transport is a Circle custom transport
@@ -151,12 +150,7 @@ export async function toCircleSmartAccount(
         hash: parameters.hash,
       })
 
-      const signature = await webAuthnSign({ hash, owner })
-
-      return wrapSignature({
-        signature,
-        sender,
-      })
+      return signAndWrap({ hash, owner, sender })
     },
     async signMessage(parameters) {
       const address = await this.getAddress()
@@ -166,11 +160,9 @@ export async function toCircleSmartAccount(
         chainId: client.chain!.id,
         hash: hashMessage(parameters.message),
       })
-
-      const signature = await webAuthnSign({ hash, owner })
-
-      return wrapSignature({
-        signature,
+      return signAndWrap({
+        hash,
+        owner,
         sender,
       })
     },
@@ -189,34 +181,27 @@ export async function toCircleSmartAccount(
           types,
         }),
       })
-
-      const signature = await webAuthnSign({ hash, owner })
-
-      return wrapSignature({
-        signature,
-        sender,
-      })
+      return signAndWrap({ hash, owner, sender })
     },
     async signUserOperation(parameters) {
       const { chainId = client.chain!.id, ...userOperation } = parameters
 
       const address = await this.getAddress()
-      const hash = hashMessage({
-        raw: getUserOperationHash({
-          chainId,
-          entryPointAddress: entryPoint.address,
-          entryPointVersion: entryPoint.version,
-          userOperation: {
-            ...(userOperation as unknown as UserOperation),
-            sender: address,
-          },
-        }),
+      const userOperationHash = getUserOperationHash({
+        chainId,
+        entryPointAddress: entryPoint.address,
+        entryPointVersion: entryPoint.version,
+        userOperation: {
+          ...(userOperation as unknown as UserOperation),
+          sender: address,
+        },
       })
-      const signature = await webAuthnSign({ hash, owner })
-      const formattedSender = pad(slice(sender, 2))
-      return wrapSignature({
-        signature,
-        sender: formattedSender,
+      const pubKeyId = pad(slice(sender, 2))
+
+      return signAndWrap({
+        hash: userOperationHash,
+        owner,
+        sender: pubKeyId,
         hasUserOpGas: true,
       })
     },
