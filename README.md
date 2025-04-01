@@ -33,29 +33,29 @@ Confirm that you are using the correct Node.js version listed in the `.nvmrc` fi
 node -v
 ```
 
-This project uses `yarn` to install dependencies, please ensure you have it installed.
+This project uses `pnpm` to install dependencies, please ensure you have it installed.
 
 > [!TIP]
-> Since Node.js v14.19, you can use the [corepack](https://github.com/nodejs/corepack) command to enable `yarn`:
+> Since Node.js v16.13, you can use the [corepack](https://github.com/nodejs/corepack) command to enable `pnpm`:
 >
 > ```zsh
-> corepack enable
+> corepack enable pnpm
 > ```
 
-You can confirm that you have `yarn` installed with:
+You can confirm that you have `pnpm` installed with:
 
 ```zsh
-yarn -v
+pnpm -v
 ```
 
-You can now install the project dependencies using `yarn`:
+You can now install the project dependencies using `pnpm`:
 
 ```zsh
-yarn install
+pnpm install
 ```
 
 > [!TIP]
-> It is good practice to run the `yarn install` command every time dependencies in the `package.json` are changed when updating your branch
+> It is good practice to run the `pnpm install` command every time dependencies in the `package.json` are changed when updating your branch
 
 #### Example: installing a node version manager
 
@@ -76,7 +76,7 @@ nvm use
 To lint the project:
 
 ```zsh
-yarn lint
+pnpm lint
 ```
 
 ### Test
@@ -84,11 +84,11 @@ yarn lint
 To run all unit tests, run:
 
 ```zsh
-yarn test
+pnpm test
 ```
 
 To generate coverage reports:
 
 ```zsh
-yarn test:coverage
+pnpm test:coverage
 ```
