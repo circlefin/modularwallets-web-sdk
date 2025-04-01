@@ -1,6 +1,6 @@
-# Circle Smart Account Example
+# Dynamic Integration Example
 
-This example Vite application demonstrates how to register and log in to a Circle Smart Account using passkeys. It also showcases how to perform a user operation with the account on Polygon Amoy.
+This example Vite application demonstrates how to integrate [Dynamic](https://www.dynamic.xyz/)'s SDK using an EOA account.
 
 ## Run the example app
 
@@ -16,12 +16,13 @@ Under `.env`, make sure the following environment variables are configured prope
 
 - `VITE_CLIENT_KEY`: Paste your Client Key here. You can create one in [Circle Developer Console](https://console.circle.com/wallets/modular/configurator).
 - `VITE_CLIENT_URL`: Paste the Client URL here. You can copy it from [Circle Developer Console](https://console.circle.com/wallets/modular/configurator).
+- `VITE_DYNAMIC_ENV_ID`: Paste the Dynamic Environment ID here. You can copy it from [Dynamic Console](https://app.dynamic.xyz/dashboard/overview).
 
 Once you have these environment variables setup, you can now follow the steps below to run the app locally.
 
 ### Install dependencies
 
-You first need to make sure you have followed the [README](https://github.com/circlefin/modularwallets-web-sdk/blob/master/README.md) under project root and have installed all dependencies under root folder:
+You first need to make sure you have followed the [README](https://github.com/circlefin/w3s-web-core-sdk/blob/master/README.md) under project root and have installed all dependencies under root folder:
 
 ```bash
 $ pnpm install
@@ -41,7 +42,7 @@ This will generate the necessary distribution files that this example depends on
 Now you need to go to this example folder:
 
 ```bash
-$ cd examples/circle-smart-account
+$ cd examples/dynamic-integration
 ```
 
 Once you are under the example folder, install all dependencies for the app:

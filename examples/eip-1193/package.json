@@ -7,10 +7,10 @@
     "dev": "vite"
   },
   "dependencies": {
+    "@circle-fin/modular-wallets-core": "workspace:*",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "viem": "^2.21.27",
-    "@circle-fin/modular-wallets-core": "^1.x.x",
     "web3": "^4.16.0"
   },
   "devDependencies": {
