@@ -18,7 +18,7 @@
 
 import type { CIRCLE_MSCA_6900_V1_EP07_FACTORY_ABI } from '../abis'
 import type { Address } from 'abitype'
-import type { Assign, Client, Prettify } from 'viem'
+import type { Assign, Client, Prettify, LocalAccount } from 'viem'
 import type {
   SmartAccount,
   SmartAccountImplementation,
@@ -41,7 +41,7 @@ export type ToCircleSmartAccountParameters = {
   /**
    * The owner.
    */
-  owner: WebAuthnAccount
+  owner: LocalAccount | WebAuthnAccount
   /**
    * The Nonce.
    */

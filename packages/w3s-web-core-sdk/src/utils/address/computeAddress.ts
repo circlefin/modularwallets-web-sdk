@@ -26,11 +26,11 @@ import {
 
 import { ERC1769_PROXY, FACTORY, UPGRADABLE_MSCA } from '../../constants'
 
-import { getPublicKeyParamsFromOwner } from './getPublicKeyParamsFromOwner'
 import { getSalt } from './getSalt'
+import { getSenderForContract } from './getSenderForContract'
 import { getInitializeUpgradableMSCAData } from './initializeUpgradableMSCA'
 
-import type { Address } from 'viem'
+import type { Address, LocalAccount } from 'viem'
 import type { WebAuthnAccount } from 'viem/account-abstraction'
 
 /**
@@ -38,8 +38,8 @@ import type { WebAuthnAccount } from 'viem/account-abstraction'
  * @param owner - The owner.
  * @returns The computed address.
  */
-export function computeAddress(owner: WebAuthnAccount): Address {
-  const { sender } = getPublicKeyParamsFromOwner(owner)
+export function computeAddress(owner: WebAuthnAccount | LocalAccount): Address {
+  const sender = getSenderForContract(owner)
   const salt = getSalt()
   const initializeUpgradableMSCAData = getInitializeUpgradableMSCAData(owner)
 

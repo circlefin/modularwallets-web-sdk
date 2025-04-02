@@ -24,12 +24,15 @@ import {
 } from '../../../constants'
 import { MockModularWalletsProvider } from '../../providers'
 
+import type { ToModularTransportParameters } from '../../../types/__mocks__/provider'
+
 /**
  * Creates a custom transport instance with mock ModularWallets provider.
+ * @param parameter - ToModularTransportParameter.
  * @returns The custom transport instance.
  */
-export const toModularTransport = () => {
-  const provider = new MockModularWalletsProvider()
+export const toModularTransport = (parameter: ToModularTransportParameters) => {
+  const provider = new MockModularWalletsProvider(parameter.accountType)
   const config = {
     key: MODULAR_WALLETS_TRANSPORT_KEY,
     name: MODULAR_WALLETS_TRANSPORT_NAME,

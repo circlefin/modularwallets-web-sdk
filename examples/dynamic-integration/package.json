@@ -1,0 +1,25 @@
+{
+  "name": "example-dynamic-integration",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite"
+  },
+  "dependencies": {
+    "@circle-fin/modular-wallets-core": "workspace:*",
+    "@dynamic-labs/ethereum": "^4.6.0",
+    "@dynamic-labs/sdk-react-core": "^4.6.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "viem": "^2.21.27",
+    "wagmi": "^2.14.11"
+  },
+  "devDependencies": {
+    "@types/react": "^18.0.27",
+    "@types/react-dom": "^18.0.10",
+    "@vitejs/plugin-react": "^4.3.2",
+    "typescript": "^5.0.3",
+    "vite": "^5.4.14"
+  }
+}

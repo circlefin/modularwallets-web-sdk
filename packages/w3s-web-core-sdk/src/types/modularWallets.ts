@@ -16,20 +16,29 @@
  * limitations under the License.
  */
 
-import type { Hex } from 'viem'
+import type { AtLeastOne } from './utils'
+import type { Hex, LocalAccount } from 'viem'
+import type { WebAuthnAccount } from 'viem/account-abstraction'
+
+/**
+ * The EOA identifier.
+ */
+export interface EOAIdentifier {
+  address: Hex
+}
+
+/**
+ * The Webauthn identifier.
+ */
+export interface WebAuthnIdentifier {
+  publicKeyX: string
+  publicKeyY: string
+}
 
 /**
  * The Webauthn owner.
  */
-export interface WebauthnOwner {
-  /**
-   * The public key X coordinate.
-   */
-  publicKeyX: string
-  /**
-   * The public key Y coordinate.
-   */
-  publicKeyY: string
+export interface WebauthnOwner extends WebAuthnIdentifier {
   /**
    * The weight.
    */
@@ -37,18 +46,34 @@ export interface WebauthnOwner {
 }
 
 /**
- * The Circle modular wallet weighted multisig.
+ * The Eoa owner.
  */
-export interface WeightedMultisig {
+export interface EoaOwner extends EOAIdentifier {
   /**
-   * The Webauthn owners.
+   * The weight.
    */
-  webauthnOwners: WebauthnOwner[]
+  weight: number
+}
+
+/**
+ * The Base type of Circle modular wallet weighted multisig.
+ */
+export interface WeightedMultisigBase {
   /**
    * The threshold weight.
    */
   thresholdWeight: number
 }
+
+/**
+ * The Circle modular wallet weighted multisig.
+ * Ensures at least one owner is present.
+ */
+export type WeightedMultisig = WeightedMultisigBase &
+  AtLeastOne<{
+    owners?: EoaOwner[]
+    webauthnOwners?: WebauthnOwner[]
+  }>
 
 /**
  * The Circle modular wallet initial ownership configuration.
@@ -133,4 +158,15 @@ export interface EncodeTransferReturnType {
    * The token address.
    */
   to: Hex
+}
+
+/*
+ * Enum representing different types of accounts.
+ */
+export enum AccountType {
+  /** Used for {@link WebAuthnAccount}, an account that relies on WebAuthn for authentication and signing. */
+  WebAuthn = 'webAuthn',
+
+  /** Used for {@link LocalAccount}, an account that is stored locally and supports private key-based signing. */
+  Local = 'local',
 }

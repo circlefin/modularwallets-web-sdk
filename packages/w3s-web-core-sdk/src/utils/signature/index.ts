@@ -19,3 +19,4 @@
 export * from './toReplaySafeHash'
 export * from './toWebAuthnSignature'
 export * from './wrapSignature'
+export * from './wrapEoaSignature'

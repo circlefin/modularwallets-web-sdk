@@ -32,11 +32,12 @@ export { ContractAddress } from './constants'
 export * from './providers'
 
 // Utils
-export { encodeTransfer } from './utils'
+export { encodeTransfer, walletClientToLocalAccount } from './utils'
 
 // Types
 export {
   WebAuthnMode,
+  AccountType,
   type AuthenticatorAssertionResponse,
   type AuthenticatorAttestationResponse,
   type CircleSmartAccountImplementation,

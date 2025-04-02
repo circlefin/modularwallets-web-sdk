@@ -17,3 +17,5 @@
  */
 
 export * from './getMinimumVerificationGasLimit'
+export * from './isWebAuthnOwner'
+export * from './walletClientToLocalAccount'

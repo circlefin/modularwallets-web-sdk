@@ -17,3 +17,4 @@
  */
 
 export * from './encoding'
+export * from './smartAccount'

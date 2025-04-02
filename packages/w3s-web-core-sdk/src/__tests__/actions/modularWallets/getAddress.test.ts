@@ -21,24 +21,30 @@ import { createPublicClient } from 'viem'
 import {
   GetAddressMockParameters,
   GetAddressResult,
+  MockOwnersMetadata,
   toModularTransport,
 } from '../../../__mocks__'
 import { getAddress } from '../../../actions'
 import { toCircleModularWalletClient } from '../../../clients'
 
+const owners = MockOwnersMetadata
+
 describe('Actions > modularWallets > getAddress', () => {
-  it('should return wallet creation result', async () => {
-    const modularTransport = toModularTransport()
-    const client = createPublicClient({ transport: modularTransport })
-    const circleModularWalletClient = toCircleModularWalletClient({
-      client,
-    })
+  it.each(owners)(
+    'should return wallet creation result $description',
+    async ({ accountType }) => {
+      const transport = toModularTransport({ accountType })
+      const client = createPublicClient({ transport })
+      const circleModularWalletClient = toCircleModularWalletClient({
+        client,
+      })
 
-    const result = await getAddress(
-      circleModularWalletClient,
-      GetAddressMockParameters,
-    )
+      const result = await getAddress(
+        circleModularWalletClient,
+        GetAddressMockParameters[accountType],
+      )
 
-    expect(result).toEqual(GetAddressResult)
-  })
+      expect(result).toEqual(GetAddressResult[accountType])
+    },
+  )
 })

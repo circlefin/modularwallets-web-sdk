@@ -22,7 +22,7 @@ import {
   toWebAuthnAccount,
 } from 'viem/account-abstraction'
 import { sepolia } from 'viem/chains'
-import { MethodNotImplementedError } from 'web3'
+import { MethodNotImplementedError } from 'web3-errors'
 
 import {
   LoginCredentialMock,
@@ -46,7 +46,7 @@ import {
 } from '../../../__mocks__/providers/eip-1193'
 import { toCircleSmartAccount, toWebAuthnCredential } from '../../../accounts'
 import { EIP1193Provider } from '../../../providers/eip-1193'
-import { WebAuthnMode } from '../../../types'
+import { AccountType, WebAuthnMode } from '../../../types'
 
 import type {
   ToCircleSmartAccountReturnType,
@@ -71,7 +71,9 @@ let owner: WebAuthnAccount
 let bundlerClient: BundlerClient
 let provider: EIP1193Provider
 
-const modularTransport = toModularTransport()
+const modularTransport = toModularTransport({
+  accountType: AccountType.WebAuthn,
+})
 const publicClient = createPublicClient({
   chain: sepolia,
   transport: http(),

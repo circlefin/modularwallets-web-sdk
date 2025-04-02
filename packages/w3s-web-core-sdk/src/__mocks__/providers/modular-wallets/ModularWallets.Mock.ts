@@ -16,6 +16,8 @@
  * limitations under the License.
  */
 
+import { AccountType } from '../../../types'
+
 import type { GetAddressParameters } from '../../../actions'
 import type { GetAddressReturnType, ModularWallet } from '../../../types'
 
@@ -219,6 +221,35 @@ export const GetCodeResult = '0x12345'
 /**
  * Partial mocks for ModularWallets rpc responses - circle_getAddress.
  */
+export const MockEoaWallet: ModularWallet = {
+  id: 'test-id',
+  address: '0x92ce1d6a449d8f45e0ed8c00bf1cc7d19df69599',
+  blockchain: 'ETH-SEPOLIA',
+  state: 'LIVE',
+  scaCore: 'circle_6900_v1',
+  scaConfiguration: {
+    initialOwnershipConfiguration: {
+      ownershipContractAddress: '0x5a2262d58eB72B84701D6efBf6bB6586C793A65b',
+      weightedMultisig: {
+        owners: [
+          {
+            address: '0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266',
+            weight: 1,
+          },
+        ],
+        thresholdWeight: 1,
+      },
+    },
+    initCode:
+      '0x0000000df7e6c9dc387cafc5ecbfa6c3a6179add81d0dff1000000000000000000000000f39fd6e51aad88f6f4ce6ab8827279cfffb922660000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000006000000000000000000000000000000000000000000000000000000000000002a0000000000000000000000000000000000000000000000000000000000000006000000000000000000000000000000000000000000000000000000000000000a000000000000000000000000000000000000000000000000000000000000000e000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000c984aff541d6ce86bb697e68ec57873c80000000000000000000000000000000000000000000000000000000000000001a043327d77a74c1c55cfa799284b831fe09535a88b9f5fa4173d334e5ba0fd9100000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000016000000000000000000000000000000000000000000000000000000000000000a000000000000000000000000000000000000000000000000000000000000000e00000000000000000000000000000000000000000000000000000000000000120000000000000000000000000000000000000000000000000000000000000014000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000001000000000000000000000000f39fd6e51aad88f6f4ce6ab8827279cfffb922660000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000',
+  },
+  createDate: '2024-11-05T01:27:17Z',
+  updateDate: '2024-11-05T01:27:17Z',
+}
+
+/**
+ * Partial mocks for ModularWallets rpc responses - circle_getAddress.
+ */
 export const MockWallet: ModularWallet = {
   id: 'test-id',
   address: '0x0f6Fed7D7526Aaa1692438AD1D77AaA0Ea9d0a56',
@@ -279,7 +310,10 @@ export const MockWalletForValidationError: ModularWallet = {
 /**
  * Mocks for ModularWallets rpc responses - circle_getAddress.
  */
-export const GetAddressResult: GetAddressReturnType = MockWallet
+export const GetAddressResult: Record<string, GetAddressReturnType> = {
+  [AccountType.WebAuthn]: MockWallet,
+  [AccountType.Local]: MockEoaWallet,
+}
 
 /**
  * Mocks for ModularWallets rpc responses - circle_getAddress.
@@ -290,25 +324,45 @@ export const GetAddressResultForValidationError: GetAddressReturnType =
 /**
  * Mocks for ModularWallets action - getAddress.
  */
-export const GetAddressMockParameters: GetAddressParameters = [
-  {
-    scaConfiguration: {
-      initialOwnershipConfiguration: {
-        weightedMultisig: {
-          webauthnOwners: [
-            {
-              publicKeyX: '1',
-              publicKeyY: '1',
-              weight: 1,
-            },
-          ],
-          thresholdWeight: 1,
+export const GetAddressMockParameters: Record<string, GetAddressParameters> = {
+  [AccountType.WebAuthn]: [
+    {
+      scaConfiguration: {
+        initialOwnershipConfiguration: {
+          weightedMultisig: {
+            webauthnOwners: [
+              {
+                publicKeyX: '1',
+                publicKeyY: '1',
+                weight: 1,
+              },
+            ],
+            thresholdWeight: 1,
+          },
         },
+        scaCore: 'circle_6900_v1',
       },
-      scaCore: 'circle_6900_v1',
     },
-  },
-]
+  ],
+  [AccountType.Local]: [
+    {
+      scaConfiguration: {
+        initialOwnershipConfiguration: {
+          weightedMultisig: {
+            owners: [
+              {
+                address: '0x1234',
+                weight: 1,
+              },
+            ],
+            thresholdWeight: 1,
+          },
+        },
+        scaCore: 'circle_6900_v1',
+      },
+    },
+  ],
+}
 
 /**
  * Mocks for Paymaster rpc responses - pm_getPaymasterData.

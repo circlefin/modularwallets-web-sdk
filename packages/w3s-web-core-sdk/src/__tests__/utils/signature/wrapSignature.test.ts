@@ -20,20 +20,20 @@ import { toWebAuthnAccount } from 'viem/account-abstraction'
 
 import {
   LoginCredentialMock,
-  MockSignResult,
   MockWrappedSignResult,
+  MockSignResult,
   MockWrappedUserOpSignResult,
   toPasskeyTransport,
 } from '../../../__mocks__'
 import { toWebAuthnCredential } from '../../../accounts'
-import { WebAuthnMode } from '../../../types'
+import { AccountType, WebAuthnMode } from '../../../types'
 import { getPublicKeyParamsFromOwner, wrapSignature } from '../../../utils'
 
 import type { Hex } from 'viem'
 import type { WebAuthnAccount } from 'viem/account-abstraction'
 
 describe('Utils > signature > wrapSignature', () => {
-  const signature: Hex = MockSignResult
+  const signature: Hex = MockSignResult[AccountType.WebAuthn]
   let owner: WebAuthnAccount
 
   beforeEach(async () => {
@@ -55,7 +55,7 @@ describe('Utils > signature > wrapSignature', () => {
 
     const result = wrapSignature({ sender, signature })
 
-    expect(result).toEqual(MockWrappedSignResult)
+    expect(result).toEqual(MockWrappedSignResult[AccountType.WebAuthn])
   })
 
   it('should wrap a valid user operation signature correctly', () => {
@@ -63,6 +63,6 @@ describe('Utils > signature > wrapSignature', () => {
 
     const result = wrapSignature({ sender, signature, hasUserOpGas: true })
 
-    expect(result).toEqual(MockWrappedUserOpSignResult)
+    expect(result).toEqual(MockWrappedUserOpSignResult[AccountType.WebAuthn])
   })
 })

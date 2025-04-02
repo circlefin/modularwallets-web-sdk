@@ -18,20 +18,15 @@
 
 import { encodeAbiParameters, encodeFunctionData } from 'viem'
 
-import {
-  CIRCLE_PLUGIN_INSTALL_DATA_ABI,
-  INITIALIZING_DATA_ABI_PARAMS,
-} from '../../abis'
+import { INITIALIZING_DATA_ABI_PARAMS } from '../../abis'
 import {
   CIRCLE_WEIGHTED_WEB_AUTHN_MULTISIG_PLUGIN,
-  PUBLIC_KEY_OWN_WEIGHTS,
-  THRESHOLD_WEIGHT,
   UPGRADABLE_MSCA,
 } from '../../constants'
 
-import { getPublicKeyParamsFromOwner } from './getPublicKeyParamsFromOwner'
+import { getPluginInstallParams } from './getPluginInstallParams'
 
-import type { Hex } from 'viem'
+import type { Hex, LocalAccount } from 'viem'
 import type { WebAuthnAccount } from 'viem/account-abstraction'
 
 /**
@@ -39,15 +34,12 @@ import type { WebAuthnAccount } from 'viem/account-abstraction'
  * @param owner - The owner.
  * @returns The encoded initializeUpgradableMSCA function data.
  */
-export function getInitializeUpgradableMSCAData(owner: WebAuthnAccount): Hex {
-  const { initialPublicKeyOwners } = getPublicKeyParamsFromOwner(owner)
+export function getInitializeUpgradableMSCAData(
+  owner: WebAuthnAccount | LocalAccount,
+): Hex {
+  const pluginInstallParams = getPluginInstallParams(owner)
 
-  const pluginInstallParams = encodeAbiParameters(
-    CIRCLE_PLUGIN_INSTALL_DATA_ABI,
-    [[], [], initialPublicKeyOwners, PUBLIC_KEY_OWN_WEIGHTS, THRESHOLD_WEIGHT],
-  )
-
-  const initializeUpgradableMSCAData = encodeFunctionData({
+  return encodeFunctionData({
     abi: UPGRADABLE_MSCA.abi,
     functionName: 'initializeUpgradableMSCA',
     args: [
@@ -56,8 +48,6 @@ export function getInitializeUpgradableMSCAData(owner: WebAuthnAccount): Hex {
       [pluginInstallParams],
     ],
   })
-
-  return initializeUpgradableMSCAData
 }
 
 /**
@@ -65,22 +55,14 @@ export function getInitializeUpgradableMSCAData(owner: WebAuthnAccount): Hex {
  * @param owner - The owner.
  * @returns The encoded initializeUpgradableMSCA function parameters.
  */
-export function getInitializeUpgradableMSCAParams(owner: WebAuthnAccount): Hex {
-  const { initialPublicKeyOwners } = getPublicKeyParamsFromOwner(owner)
+export function getInitializeUpgradableMSCAParams(
+  owner: LocalAccount | WebAuthnAccount,
+): Hex {
+  const pluginInstallParams = getPluginInstallParams(owner)
 
-  const pluginInstallParams = encodeAbiParameters(
-    CIRCLE_PLUGIN_INSTALL_DATA_ABI,
-    [[], [], initialPublicKeyOwners, PUBLIC_KEY_OWN_WEIGHTS, THRESHOLD_WEIGHT],
-  )
-
-  const initializeUpgradableMSCAParams = encodeAbiParameters(
-    INITIALIZING_DATA_ABI_PARAMS,
-    [
-      [CIRCLE_WEIGHTED_WEB_AUTHN_MULTISIG_PLUGIN.address],
-      [CIRCLE_WEIGHTED_WEB_AUTHN_MULTISIG_PLUGIN.manifestHash],
-      [pluginInstallParams],
-    ],
-  )
-
-  return initializeUpgradableMSCAParams
+  return encodeAbiParameters(INITIALIZING_DATA_ABI_PARAMS, [
+    [CIRCLE_WEIGHTED_WEB_AUTHN_MULTISIG_PLUGIN.address],
+    [CIRCLE_WEIGHTED_WEB_AUTHN_MULTISIG_PLUGIN.manifestHash],
+    [pluginInstallParams],
+  ])
 }

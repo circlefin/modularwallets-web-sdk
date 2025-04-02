@@ -18,8 +18,8 @@
 
 import { encodeFunctionData, erc20Abi } from 'viem'
 
+import type { ContractAddress } from '../../constants'
 import type { EncodeTransferReturnType } from '../../types'
-import type { ContractAddress } from 'src/constants'
 import type { Hex } from 'viem'
 
 /**

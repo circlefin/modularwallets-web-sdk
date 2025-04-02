@@ -24,8 +24,19 @@ Once you have these environment variables setup, you can now follow the steps be
 You first need to make sure you have followed the [README](https://github.com/circlefin/modularwallets-web-sdk/blob/master/README.md) under project root and have installed all dependencies under root folder:
 
 ```bash
-$ yarn install
+$ pnpm install
 ```
+
+#### Important: Build the SDK
+
+Since this project uses pnpm workspaces, you must build the SDK packages before running the example:
+
+```bash
+# From the project root directory
+$ pnpm build
+```
+
+This will generate the necessary distribution files that this example depends on.
 
 Now you need to go to this example folder:
 
@@ -36,7 +47,7 @@ $ cd examples/circle-smart-account
 Once you are under the example folder, install all dependencies for the app:
 
 ```bash
-$ yarn install
+$ pnpm install
 ```
 
 ### Run the app
@@ -44,25 +55,13 @@ $ yarn install
 To run the app locally:
 
 ```bash
-$ yarn dev
+$ pnpm dev
 ```
 
 Now you should be able to see your app up and running in your browser at: `http://localhost:5173/`.
 
 ### Important Notes
 
-- __Do Not Import from `src` or `dist` Directories Directly:__
-  
-  Always import the Core SDK using the package name:
+- **Ensure the installed SDK version is greater than or equal to `1.0.3`:**
 
-  ```ts
-  import { yourFunction } from 'w3s-web-core-sdk'
-  ```
-
-- __Watching Changes from the Core SDK Package__
-
-  If you are developing new SDK features, run `yarn dev` from the [core SDK package directory](../../packages/w3s-web-core-sdk) to build your changes in real time.
-
-- __Ensure Build-Time Constants Are Replaced:__
-
-  Variables like `SDK_VERSION` should be replaced during the build process. If you encounter issues, make sure you're using the compiled code from the dist directory.
+  If you receive an error message that says `Address mismatch` in the example app, make sure you are using the correct version of the SDK as we updated the MSCAUpgradable smart contract implementation in version `1.0.3`. This error occurs when the SDK version is less than `1.0.3`.

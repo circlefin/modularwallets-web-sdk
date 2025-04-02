@@ -28,7 +28,11 @@ import {
   toPasskeyTransport,
 } from '../../../__mocks__'
 import { toWebAuthnCredential, webAuthnSign } from '../../../accounts'
-import { WebAuthnMode, type ToWebAuthnAccountParameters } from '../../../types'
+import {
+  AccountType,
+  WebAuthnMode,
+  type ToWebAuthnAccountParameters,
+} from '../../../types'
 
 describe('Accounts > implementations > webAuthnSign', () => {
   const mockNavigatorGet = globalThis.window.navigator.credentials[
@@ -50,7 +54,10 @@ describe('Accounts > implementations > webAuthnSign', () => {
   })
 
   it('should return signature', async () => {
-    const signature = await webAuthnSign({ owner, hash: MockReplaySafeHash })
+    const signature = await webAuthnSign({
+      owner,
+      hash: MockReplaySafeHash[AccountType.WebAuthn],
+    })
 
     expect(signature).toBe(MockInternalSignResult)
   })
