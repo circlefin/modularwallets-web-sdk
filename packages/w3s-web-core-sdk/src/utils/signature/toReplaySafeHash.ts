@@ -16,7 +16,13 @@
  * limitations under the License.
  */
 
-import { encodePacked, keccak256, pad } from 'viem'
+import {
+  concatHex,
+  encodeAbiParameters,
+  encodePacked,
+  keccak256,
+  pad,
+} from 'viem'
 
 import {
   CIRCLE_WEIGHTED_WEB_AUTHN_MULTISIG_PLUGIN,
@@ -24,7 +30,7 @@ import {
   REPLAY_SAFE_HASH_V1,
 } from '../../constants'
 
-import type { Address, Hash, Hex } from 'viem'
+import type { Address, Hash } from 'viem'
 
 interface ReplaySafeHashParameters {
   /**
@@ -51,39 +57,43 @@ export function toReplaySafeHash({
   chainId,
   hash,
 }: ReplaySafeHashParameters): Hash {
-  const textEncoder = new TextEncoder()
-
   const { name, version, domainSeparatorType, moduleType } = REPLAY_SAFE_HASH_V1
 
   const domainSeparatorTypeHash = keccak256(
-    textEncoder.encode(domainSeparatorType),
+    encodePacked(['string'], [domainSeparatorType]),
+  )
+  const moduleNameHash = keccak256(encodePacked(['string'], [name]))
+  const moduleVersionHash = keccak256(encodePacked(['string'], [version]))
+  const moduleTypeHash = keccak256(encodePacked(['string'], [moduleType]))
+
+  const domainSeparator = keccak256(
+    encodeAbiParameters(
+      [
+        { type: 'bytes32' },
+        { type: 'bytes32' },
+        { type: 'bytes32' },
+        { type: 'uint256' },
+        { type: 'address' },
+        { type: 'bytes32' },
+      ],
+      [
+        domainSeparatorTypeHash,
+        moduleNameHash,
+        moduleVersionHash,
+        BigInt(chainId),
+        CIRCLE_WEIGHTED_WEB_AUTHN_MULTISIG_PLUGIN.address,
+        pad(address, { dir: 'right' }),
+      ],
+    ),
   )
 
-  const moduleIdHash = keccak256(
-    encodePacked(['string', 'string'], [name, version]),
+  const structHash = keccak256(
+    encodeAbiParameters(
+      [{ type: 'bytes32' }, { type: 'bytes32' }],
+      [moduleTypeHash, hash],
+    ),
   )
-
-  const moduleTypeHash = keccak256(textEncoder.encode(moduleType))
-
-  const domainSeparator = encodePacked(
-    ['bytes', 'bytes', 'uint256', 'bytes32', 'bytes32'],
-    [
-      domainSeparatorTypeHash,
-      moduleIdHash,
-      BigInt(chainId),
-      pad(CIRCLE_WEIGHTED_WEB_AUTHN_MULTISIG_PLUGIN.address),
-      pad(address, {
-        dir: 'right',
-      }),
-    ],
-  )
-
-  const structHash = encodePacked(['bytes', 'bytes'], [moduleTypeHash, hash])
 
   // Generate the replay safe hash using EIP712
-  return keccak256(
-    (EIP712_PREFIX +
-      keccak256(domainSeparator).slice(2) +
-      keccak256(structHash).slice(2)) as Hex,
-  )
+  return keccak256(concatHex([EIP712_PREFIX, domainSeparator, structHash]))
 }
