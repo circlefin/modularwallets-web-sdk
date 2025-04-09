@@ -63,6 +63,4 @@ Now you should be able to see your app up and running in your browser at: `http:
 
 ### Important Notes
 
-- **Ensure the installed SDK version is greater than or equal to `1.0.3`:**
-
-  If you receive an error message that says `Address mismatch` in the example app, make sure you are using the correct version of the SDK as we updated the MSCAUpgradable smart contract implementation in version `1.0.3`. This error occurs when the SDK version is less than `1.0.3`.
+**Ensure the installed SDK version is greater than or equal to `1.0.5`**
