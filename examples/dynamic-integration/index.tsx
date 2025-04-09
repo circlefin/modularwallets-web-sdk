@@ -3,7 +3,11 @@ import { createPublicClient, Hex, parseEther } from "viem"
 
 import { isEthereumWallet } from "@dynamic-labs/ethereum"
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core"
-import { toCircleSmartAccount, toModularTransport, walletClientToLocalAccount } from "modular-wallets-core"
+import { 
+  toCircleSmartAccount,
+  toModularTransport,
+  walletClientToLocalAccount
+} from "@circle-fin/modular-wallets-core"
 import { createBundlerClient, SmartAccount } from "viem/account-abstraction"
 import { polygonAmoy } from "viem/chains"
 
