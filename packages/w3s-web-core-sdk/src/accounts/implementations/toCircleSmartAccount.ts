@@ -73,6 +73,7 @@ export async function toCircleSmartAccount(
     getInitializeUpgradableMSCAParams(owner)
   const salt = getSalt()
   let deployed = false
+  let walletAddress: Address | undefined
 
   // Only calls Circle Modular Wallet API if the client transport is a Circle custom transport
   if (client.transport.key === MODULAR_WALLETS_TRANSPORT_KEY) {
@@ -83,10 +84,9 @@ export async function toCircleSmartAccount(
       owner,
       name,
     })
-    // Check if the wallet address matches the owner address (case insensitive)
-    if (wallet.address?.toLowerCase() !== computeAddress(owner).toLowerCase()) {
-      throw new Error('Address mismatch')
-    }
+
+    // Set the address from the RPC response
+    walletAddress = wallet.address
   }
 
   return toSmartAccount({
@@ -95,6 +95,7 @@ export async function toCircleSmartAccount(
     extend: { abi, factory },
     getAddress: async function (): Promise<Address> {
       if (address) return Promise.resolve(address)
+      if (walletAddress) return Promise.resolve(walletAddress)
       return Promise.resolve(computeAddress(owner))
     },
     encodeCalls: function (
@@ -209,7 +210,7 @@ export async function toCircleSmartAccount(
       async estimateGas(userOperation) {
         if (!deployed) {
           const code = await publicClient.getCode({
-            address: computeAddress(owner),
+            address: walletAddress ?? computeAddress(owner),
           })
 
           deployed = code !== '0x' && Boolean(code)

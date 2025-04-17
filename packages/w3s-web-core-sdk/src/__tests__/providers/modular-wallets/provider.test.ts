@@ -23,10 +23,12 @@ import {
   BlockNumberResult,
   BlockResult,
   ChainIdResult,
+  CreateAddressMappingResult,
   EntryPointsResult,
   EstimateUserOperationGasResult,
   EthCallResult,
   GasPriceResult,
+  GetAddressMappingResult,
   GetAddressResult,
   GetBalanceResult,
   GetCodeResult,
@@ -282,8 +284,38 @@ describe('Providers > modular-wallets > ModularWalletsProvider > fetchData', () 
     expect(response).toEqual(GetAddressResult[AccountType.WebAuthn])
   })
 
+  it('should fetch data successfully and return the correct response for circle_createAddressMapping', async () => {
+    const mockPayload = { method: 'circle_createAddressMapping', id: 15 }
+
+    fetchMock.mockResponseOnce(
+      getJsonRpcStringifyResponse(CreateAddressMappingResult),
+    )
+
+    const response = await provider.request<
+      string,
+      typeof CreateAddressMappingResult
+    >(mockPayload)
+
+    expect(response).toEqual(CreateAddressMappingResult)
+  })
+
+  it('should fetch data successfully and return the correct response for circle_getAddressMapping', async () => {
+    const mockPayload = { method: 'circle_getAddressMapping', id: 16 }
+
+    fetchMock.mockResponseOnce(
+      getJsonRpcStringifyResponse(GetAddressMappingResult),
+    )
+
+    const response = await provider.request<
+      string,
+      typeof GetAddressMappingResult
+    >(mockPayload)
+
+    expect(response).toEqual(GetAddressMappingResult)
+  })
+
   it('should fetch data successfully and return the correct response for pm_getPaymasterData', async () => {
-    const mockPayload = { method: 'pm_getPaymasterData', id: 15 }
+    const mockPayload = { method: 'pm_getPaymasterData', id: 17 }
 
     fetchMock.mockResponseOnce(
       getJsonRpcStringifyResponse(GetPaymasterDataResult),
@@ -298,7 +330,7 @@ describe('Providers > modular-wallets > ModularWalletsProvider > fetchData', () 
   })
 
   it('should fetch data successfully and return the correct response for pm_getPaymasterStubData', async () => {
-    const mockPayload = { method: 'pm_getPaymasterStubData', id: 16 }
+    const mockPayload = { method: 'pm_getPaymasterStubData', id: 18 }
 
     fetchMock.mockResponseOnce(
       getJsonRpcStringifyResponse(GetPaymasterStubDataResult),

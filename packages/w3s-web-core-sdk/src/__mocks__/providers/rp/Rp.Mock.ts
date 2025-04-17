@@ -28,11 +28,16 @@ import type {
   GetRegistrationOptionsReturnType,
   GetRegistrationVerificationReturnType,
 } from '../../../types'
+import type { PublicKey } from 'webauthn-p256'
 
 export const PublicKeyHexMock =
   '0x3059301306072a8648ce3d020106082a8648ce3d030107034200041fd0593f9f25ed8ecab174bba6ea6fcf22909c53b3a4e34d5a9f6abd37d6f98cf4954eec64a4b8a39c89e7c4a00b315359e0113fa3fa325ac23cc30ab98a5f21'
 export const PublicKeyMock =
   'MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEKwloXaeEIRe_7bBmj_4bar5NflcphALMmWyq_rzpi5ee39aScYoJYrTtVaPnaHR_4LZUHB80j6HnwlgsZy2pTA'
+export const PublicKeyParsedMock: PublicKey = {
+  x: 21868597917460517187477761352722420524099240106164764068967151223753133342623n,
+  y: 17155303664512101283069763710135051912510533287923520223421140454424785644644n,
+}
 
 export const CustomPublicKeyCredentialRequestOptionsMock: CustomPublicKeyCredentialRequestOptions =
   {

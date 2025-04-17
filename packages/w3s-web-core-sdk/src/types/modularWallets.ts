@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import type { AtLeastOne } from './utils'
+import type { AtLeastOne, NonEmptyArray } from './utils'
 import type { Hex, LocalAccount } from 'viem'
 import type { WebAuthnAccount } from 'viem/account-abstraction'
 
@@ -24,6 +24,9 @@ import type { WebAuthnAccount } from 'viem/account-abstraction'
  * The EOA identifier.
  */
 export interface EOAIdentifier {
+  /**
+   * The address.
+   */
   address: Hex
 }
 
@@ -31,7 +34,13 @@ export interface EOAIdentifier {
  * The Webauthn identifier.
  */
 export interface WebAuthnIdentifier {
+  /**
+   * The public key X coordinate.
+   */
   publicKeyX: string
+  /**
+   * The public key Y coordinate.
+   */
   publicKeyY: string
 }
 
@@ -170,3 +179,101 @@ export enum AccountType {
   /** Used for {@link LocalAccount}, an account that is stored locally and supports private key-based signing. */
   Local = 'local',
 }
+
+/**
+ * The owner identifier type for address mapping.
+ */
+export enum OwnerIdentifierType {
+  EOA = 'EOAOWNER',
+  WebAuthn = 'WEBAUTHOWNER',
+}
+
+/**
+ * The owner for address mapping.
+ */
+export type AddressMappingOwner =
+  | {
+      /**
+       * The EOA owner type.
+       */
+      type: OwnerIdentifierType.EOA
+      /**
+       * The EOA identifier.
+       */
+      identifier: EOAIdentifier
+    }
+  | {
+      /**
+       * The WebAuthn owner type.
+       */
+      type: OwnerIdentifierType.WebAuthn
+      /**
+       * The WebAuthn identifier.
+       */
+      identifier: WebAuthnIdentifier
+    }
+
+/**
+ * The parameters for creating an address mapping.
+ */
+export interface CreateAddressMappingParameters {
+  /**
+   * The Circle smart wallet address.
+   */
+  walletAddress: Hex
+  /**
+   * The owners of the wallet.
+   * Requires at least one owner to be specified.
+   */
+  owners: NonEmptyArray<AddressMappingOwner>
+}
+
+/**
+ * The address mapping response.
+ */
+export interface AddressMappingResponse {
+  /**
+   * The mapping ID.
+   */
+  id: string
+  /**
+   * The blockchain identifier.
+   */
+  blockchain: string
+  /**
+   * The owner information.
+   */
+  owner: AddressMappingOwner
+  /**
+   * The wallet address.
+   */
+  walletAddress: Hex
+  /**
+   * The creation date (ISO 8601 format).
+   */
+  createDate: string
+  /**
+   * The last update date (ISO 8601 format).
+   */
+  updateDate: string
+}
+
+/**
+ * The return type for adding an address mapping.
+ */
+export type CreateAddressMappingReturnType = AddressMappingResponse[]
+
+/**
+ * The parameters for getting an address mapping.
+ */
+export interface GetAddressMappingParameters {
+  /**
+   * The owner information.
+   */
+  owner: AddressMappingOwner
+}
+
+/**
+ * The return type for getting an address mapping.
+ */
+export type GetAddressMappingReturnType = AddressMappingResponse[]

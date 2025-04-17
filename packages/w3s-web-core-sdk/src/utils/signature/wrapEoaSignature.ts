@@ -25,6 +25,10 @@ interface WrapEoaSignatureParameters {
    * The signature to wrap.
    */
   signature: Hex
+  /**
+   * Whether the signature is for a user operation.
+   */
+  hasUserOpGas: boolean
 }
 
 /**
@@ -35,13 +39,12 @@ interface WrapEoaSignatureParameters {
  */
 export function wrapEoaSignature({
   signature,
+  hasUserOpGas,
 }: WrapEoaSignatureParameters): Hex {
   const { r, s, v } = parseSignature(signature)
   if (typeof v !== 'undefined') {
-    return encodePacked(
-      ['bytes32', 'bytes32', 'uint8'],
-      [r, s, Number(v + 32n)],
-    )
+    const signType = hasUserOpGas ? Number(v + 32n) : Number(v)
+    return encodePacked(['bytes32', 'bytes32', 'uint8'], [r, s, signType])
   }
   throw new Error('signature is invalid')
 }

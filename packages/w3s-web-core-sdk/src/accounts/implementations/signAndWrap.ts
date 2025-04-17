@@ -69,12 +69,12 @@ export const signAndWrap = async ({
     const signature = await owner.signMessage({
       message: { raw: hash },
     })
-    return wrapEoaSignature({ signature })
+    return wrapEoaSignature({ signature, hasUserOpGas: true })
   }
 
   if (owner.sign) {
     const signature = await owner.sign({ hash })
-    return wrapEoaSignature({ signature })
+    return wrapEoaSignature({ signature, hasUserOpGas: false })
   }
   throw new Error('`owner` does not support raw sign.')
 }

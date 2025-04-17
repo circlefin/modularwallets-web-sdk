@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+export * from './errorCodes'
 export * from './fetchFromApi'
 export * from './isCircleUrl'
 export * from './validateClientUrl'

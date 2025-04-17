@@ -26,10 +26,12 @@ import {
   BlockNumberResult,
   BlockResult,
   ChainIdResult,
+  CreateAddressMappingResult,
   EntryPointsResult,
   EstimateUserOperationGasResult,
   EthCallResult,
   GasPriceResult,
+  GetAddressMappingResult,
   GetAddressResult,
   GetBalanceResult,
   GetCodeResult,
@@ -170,6 +172,20 @@ export default class MockModularWalletsProvider<
           await getJsonRpcResponse<API, Method, ResultType>(
             payload,
             GetAddressResult[this.accountType],
+          )
+        ).result
+      case 'circle_createAddressMapping':
+        return (
+          await getJsonRpcResponse<API, Method, ResultType>(
+            payload,
+            CreateAddressMappingResult,
+          )
+        ).result
+      case 'circle_getAddressMapping':
+        return (
+          await getJsonRpcResponse<API, Method, ResultType>(
+            payload,
+            GetAddressMappingResult,
           )
         ).result
       case 'pm_getPaymasterData':

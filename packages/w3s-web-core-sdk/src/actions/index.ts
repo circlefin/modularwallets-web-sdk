@@ -17,4 +17,5 @@
  */
 
 export * from './modularWallets'
+export * from './recovery'
 export * from './rp'

@@ -21,3 +21,8 @@
  */
 export type AtLeastOne<T, Keys extends keyof T = keyof T> = Partial<T> &
   { [K in Keys]: Required<Pick<T, K>> }[Keys]
+
+/**
+ * Utility type to ensure an array contains at least one element of the given type.
+ */
+export type NonEmptyArray<T> = [T, ...T[]]

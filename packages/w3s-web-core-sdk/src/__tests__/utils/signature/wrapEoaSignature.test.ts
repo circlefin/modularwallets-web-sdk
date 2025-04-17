@@ -30,7 +30,7 @@ describe('Utils > signature > wrapEoaSignature', () => {
   const signature: Hex = MockWrapEoaSignatureParams
 
   it('should wrap a valid signature correctly', () => {
-    const result = wrapEoaSignature({ signature })
+    const result = wrapEoaSignature({ signature, hasUserOpGas: false })
 
     expect(result).toEqual(MockWrappedSignResult[AccountType.Local])
   })
@@ -39,6 +39,7 @@ describe('Utils > signature > wrapEoaSignature', () => {
     expect(() =>
       wrapEoaSignature({
         signature: MockInvalidWrappedEoaSignature,
+        hasUserOpGas: false,
       }),
     ).toThrow('signature is invalid')
   })

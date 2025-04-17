@@ -17,6 +17,7 @@
  */
 
 export * from './accounts'
+export * from './actions'
 export * from './clients'
 export * from './providers'
 export * from './utils'
