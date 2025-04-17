@@ -16,18 +16,9 @@
  * limitations under the License.
  */
 
-import {
-  type ModularWalletActions,
-  modularWalletActions,
-} from './modularWallet'
-import { type RecoveryActions, recoveryActions } from './recovery'
-import { type RpActions, rpActions } from './rp'
-
-export {
-  ModularWalletActions,
-  modularWalletActions,
-  RecoveryActions,
-  recoveryActions,
-  RpActions,
-  rpActions,
+export enum ErrorCodes {
+  /**
+   * The requested operation failed because the resource already exists.
+   */
+  ALREADY_KNOWN = -32602,
 }

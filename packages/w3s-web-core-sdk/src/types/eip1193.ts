@@ -17,6 +17,10 @@
  */
 
 import type {
+  CreateAddressMappingParameters,
+  CreateAddressMappingReturnType,
+  GetAddressMappingParameters,
+  GetAddressMappingReturnType,
   GetAddressReturnType,
   InitialOwnershipConfiguration,
 } from './modularWallets'
@@ -83,6 +87,24 @@ export type GetAddressRpcSchema = {
   ReturnType: GetAddressReturnType
 }
 
+/**
+ * The RPC schema for adding an address mapping.
+ */
+export type CreateAddressMappingRpcSchema = {
+  Method: 'circle_createAddressMapping'
+  Parameters: [CreateAddressMappingParameters]
+  ReturnType: CreateAddressMappingReturnType
+}
+
+/**
+ * Get the address mapping for the specified owner.
+ */
+export type GetAddressMappingRpcSchema = {
+  Method: 'circle_getAddressMapping'
+  Parameters: [GetAddressMappingParameters]
+  ReturnType: GetAddressMappingReturnType
+}
+
 export type RpRpcSchema = [
   GetLoginOptionsRpcSchema,
   GetLoginVerificationRpcSchema,
@@ -90,4 +112,8 @@ export type RpRpcSchema = [
   GetRegistrationVerificationRpcSchema,
 ]
 
-export type ModularWalletRpcSchema = [GetAddressRpcSchema]
+export type ModularWalletRpcSchema = [
+  GetAddressRpcSchema,
+  CreateAddressMappingRpcSchema,
+  GetAddressMappingRpcSchema,
+]

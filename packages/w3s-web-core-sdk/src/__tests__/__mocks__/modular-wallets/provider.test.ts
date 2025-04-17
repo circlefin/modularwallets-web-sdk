@@ -22,6 +22,7 @@ import {
   BlockNumberResult,
   BlockResult,
   ChainIdResult,
+  CreateAddressMappingResult,
   EntryPointsResult,
   EstimateUserOperationGasResult,
   EthCallResult,
@@ -223,8 +224,19 @@ describe('Mocks > providers > modular-wallets > ModularWalletsProvider > fetchDa
     expect(response).toEqual(GetAddressResult[AccountType.WebAuthn])
   })
 
+  it('should fetch data successfully and return the correct response for circle_createAddressMapping', async () => {
+    const mockPayload = { method: 'circle_createAddressMapping', id: 15 }
+
+    const response = await provider.request<
+      string,
+      typeof CreateAddressMappingResult
+    >(mockPayload)
+
+    expect(response).toEqual(CreateAddressMappingResult)
+  })
+
   it('should fetch data successfully and return the correct response for pm_getPaymasterData', async () => {
-    const mockPayload = { method: 'pm_getPaymasterData', id: 15 }
+    const mockPayload = { method: 'pm_getPaymasterData', id: 16 }
 
     const response = await provider.request<
       string,
@@ -235,7 +247,7 @@ describe('Mocks > providers > modular-wallets > ModularWalletsProvider > fetchDa
   })
 
   it('should fetch data successfully and return the correct response for pm_getPaymasterStubData', async () => {
-    const mockPayload = { method: 'pm_getPaymasterStubData', id: 16 }
+    const mockPayload = { method: 'pm_getPaymasterStubData', id: 17 }
 
     const response = await provider.request<
       string,

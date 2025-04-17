@@ -36,6 +36,7 @@ import {
   toWebAuthnCredential,
 } from '../../../accounts'
 import { WebAuthnMode, AccountType } from '../../../types'
+import { computeAddress } from '../../../utils/address/computeAddress'
 
 import type {
   ToWebAuthnAccountParameters,
@@ -73,17 +74,34 @@ jest.mock('../../../accounts/implementations/getModularWalletAddress', () => ({
   getModularWalletAddress: jest.fn(),
 }))
 
-describe('Accounts > implementations > toCircleSmartAccount > address validation', () => {
+// Use a separate mock for just the computeAddress function
+jest.mock('../../../utils/address/computeAddress', () => ({
+  computeAddress: jest.fn(),
+}))
+
+describe('Accounts > implementations > toCircleSmartAccount > address resolution', () => {
   const mockedGetModularWalletAddress =
     getModularWalletAddress as jest.MockedFunction<
       typeof getModularWalletAddress
     >
 
+  const mockedComputeAddress = computeAddress as jest.MockedFunction<
+    typeof computeAddress
+  >
+
+  beforeEach(() => {
+    jest.clearAllMocks()
+    // Reset the mock for computeAddress between tests
+    mockedComputeAddress.mockReset()
+  })
+
   it.each(owners)(
-    'should return the client instance if the addresses match $description',
+    'should use the Circle Modular Wallet API address when available $description',
     async ({ getOwner }) => {
       expect(getOwner()).toBeDefined()
       const owner = getOwner()
+
+      // Mock the modular wallet address API response
       mockedGetModularWalletAddress.mockResolvedValueOnce(
         GetAddressResult[owner.type],
       )
@@ -102,18 +120,31 @@ describe('Accounts > implementations > toCircleSmartAccount > address validation
       })
 
       expect(circleSmartAccount).toBeDefined()
+
+      // Get the address from the smart account to verify it's using the Circle API address
+      const address = await circleSmartAccount.getAddress()
+
+      // The return value should be an Address from viem which is guaranteed to be Hex type
+      expect(address).toBe(GetAddressResult[owner.type].address)
+
+      // Verify our computeAddress function was not called since we're using Circle API
+      expect(mockedComputeAddress).not.toHaveBeenCalled()
     },
   )
 
   it.each(owners)(
-    'should throw an error if the addresses do not match $description',
+    'should use the Circle-provided address even when different from computed address $description',
     async ({ getOwner }) => {
+      expect(getOwner()).toBeDefined()
+      const owner = getOwner()
+
+      // Mock the modular wallet address API to return a different address
       mockedGetModularWalletAddress.mockResolvedValueOnce(
         GetAddressResultForValidationError,
       )
 
-      expect(getOwner()).toBeDefined()
-      const owner = getOwner()
+      // Mock the compute address function to return what would have been the "expected" address
+      mockedComputeAddress.mockReturnValue(GetAddressResult[owner.type].address)
 
       const transport = toModularTransport({
         accountType: owner.type as AccountType,
@@ -123,12 +154,23 @@ describe('Accounts > implementations > toCircleSmartAccount > address validation
         chain: sepolia,
       })
 
-      await expect(
-        toCircleSmartAccount({
-          client,
-          owner,
-        }),
-      ).rejects.toThrow('Address mismatch')
+      const circleSmartAccount = await toCircleSmartAccount({
+        client,
+        owner,
+      })
+
+      expect(circleSmartAccount).toBeDefined()
+
+      // Get the address from the smart account
+      const address = await circleSmartAccount.getAddress()
+
+      // Verify it's using the address from the modular wallet API
+      // even though it's different from what computeAddress would return
+      expect(address).toBe(GetAddressResultForValidationError.address)
+      expect(address).not.toBe(GetAddressResult[owner.type].address)
+
+      // Verify computeAddress was not called - it was mocked but not called by the implementation
+      expect(mockedComputeAddress).not.toHaveBeenCalled()
     },
   )
 })

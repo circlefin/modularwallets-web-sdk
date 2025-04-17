@@ -1,7 +1,7 @@
 {
   "name": "@circle-fin/modular-wallets-core",
   "description": "Serverless Typescript SDK",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",

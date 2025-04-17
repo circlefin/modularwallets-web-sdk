@@ -74,6 +74,8 @@ export default class ModularWalletsProvider<
       case 'eth_gasPrice':
       case 'eth_getCode':
       case 'circle_getAddress':
+      case 'circle_getAddressMapping':
+      case 'circle_createAddressMapping':
       case 'pm_getPaymasterData':
       case 'pm_getPaymasterStubData': {
         const response = await fetchFromApi<

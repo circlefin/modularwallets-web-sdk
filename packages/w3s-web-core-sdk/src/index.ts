@@ -36,11 +36,14 @@ export { encodeTransfer, walletClientToLocalAccount } from './utils'
 
 // Types
 export {
+  OwnerIdentifierType,
   WebAuthnMode,
   AccountType,
   type AuthenticatorAssertionResponse,
   type AuthenticatorAttestationResponse,
   type CircleSmartAccountImplementation,
+  type CreateAddressMappingReturnType,
+  type CreateAddressMappingRpcSchema,
   type CreateCredentialParameters,
   type CustomPublicKeyCredentialCreationOptions,
   type CustomPublicKeyCredentialDescriptor,
@@ -48,6 +51,8 @@ export {
   type CustomPublicKeyCredentialUserEntity,
   type GetAddressReturnType,
   type GetAddressRpcSchema,
+  type GetAddressMappingReturnType,
+  type GetAddressMappingRpcSchema,
   type GetLoginOptionsReturnType,
   type GetLoginOptionsRpcSchema,
   type GetLoginVerificationReturnType,

@@ -16,10 +16,18 @@
  * limitations under the License.
  */
 
-import { AccountType } from '../../../types'
+import { AccountType, OwnerIdentifierType } from '../../../types'
 
 import type { GetAddressParameters } from '../../../actions'
-import type { GetAddressReturnType, ModularWallet } from '../../../types'
+import type {
+  CreateAddressMappingParameters,
+  CreateAddressMappingReturnType,
+  GetAddressReturnType,
+  ModularWallet,
+  AddressMappingOwner,
+  GetAddressMappingParameters,
+  GetAddressMappingReturnType,
+} from '../../../types'
 
 /**
  * Mocks for ModularWallets rpc responses - eth_supportedEntryPoints.
@@ -384,3 +392,81 @@ export const GetPaymasterStubDataResult = {
   paymasterVerificationGasLimit: '0x0',
   paymasterPostOpGasLimit: '0x0',
 }
+
+/**
+ * Partial mocks for the EOA owner used in address mapping.
+ */
+export const EoaOwnerMock: AddressMappingOwner = {
+  type: OwnerIdentifierType.EOA,
+  identifier: {
+    address: '0x1234567890123456789012345678901234567890',
+  },
+}
+
+/**
+ * Partial mocks for the WebAuthn owner used in address mapping.
+ */
+export const WebAuthnOwnerMock: AddressMappingOwner = {
+  type: OwnerIdentifierType.WebAuthn,
+  identifier: {
+    publicKeyX: '1234567890123456789012345678901234567890',
+    publicKeyY: '0987654321098765432109876543210987654321',
+  },
+}
+
+/**
+ * Mocks for the CreateAddressMappingParameters used in address mapping.
+ */
+export const CreateAddressMappingMockParameters: CreateAddressMappingParameters =
+  {
+    walletAddress: '0x0987654321098765432109876543210987654321',
+    owners: [EoaOwnerMock, WebAuthnOwnerMock],
+  }
+
+/**
+ * Mocks for ModularWallets rpc responses - circle_createAddressMapping.
+ */
+export const CreateAddressMappingResult: CreateAddressMappingReturnType = [
+  {
+    id: 'f47ac10b-58cc-4372-a567-0e02b2c3d479',
+    blockchain: 'ETH-SEPOLIA',
+    owner: EoaOwnerMock,
+    walletAddress: '0x0987654321098765432109876543210987654321',
+    createDate: '2024-11-05T01:27:17Z',
+    updateDate: '2024-11-05T01:27:17Z',
+  },
+  {
+    id: 'a81bc81b-6d8c-4832-b360-ff1b9e49cb21',
+    blockchain: 'ETH-SEPOLIA',
+    owner: WebAuthnOwnerMock,
+    walletAddress: '0x0987654321098765432109876543210987654321',
+    createDate: '2024-11-05T01:30:45Z',
+    updateDate: '2024-11-05T01:30:45Z',
+  },
+]
+
+/**
+ * Mocks for the GetAddressMappingParameters used in address mapping lookup.
+ */
+export const GetAddressMappingMockParameters: GetAddressMappingParameters = {
+  owner: {
+    type: OwnerIdentifierType.EOA,
+    identifier: {
+      address: '0x1234567890123456789012345678901234567890',
+    },
+  },
+}
+
+/**
+ * Mocks for ModularWallets rpc responses - circle_getAddressMapping.
+ */
+export const GetAddressMappingResult: GetAddressMappingReturnType = [
+  {
+    id: 'f47ac10b-58cc-4372-a567-0e02b2c3d479',
+    blockchain: 'ETH-SEPOLIA',
+    owner: EoaOwnerMock,
+    walletAddress: '0x0987654321098765432109876543210987654321',
+    createDate: '2024-11-05T01:27:17Z',
+    updateDate: '2024-11-05T01:27:17Z',
+  },
+]

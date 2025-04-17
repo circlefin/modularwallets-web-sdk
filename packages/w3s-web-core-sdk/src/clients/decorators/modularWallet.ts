@@ -16,9 +16,20 @@
  * limitations under the License.
  */
 
-import { type GetAddressParameters, getAddress } from '../../actions'
+import {
+  type GetAddressParameters,
+  createAddressMapping,
+  getAddress,
+  getAddressMapping,
+} from '../../actions'
 
-import type { GetAddressReturnType } from '../../types'
+import type {
+  CreateAddressMappingParameters,
+  CreateAddressMappingReturnType,
+  GetAddressReturnType,
+  GetAddressMappingParameters,
+  GetAddressMappingReturnType,
+} from '../../types'
 import type { Client, Transport } from 'viem'
 
 export type ModularWalletActions = {
@@ -30,6 +41,22 @@ export type ModularWalletActions = {
   getAddress: (
     parameters: GetAddressParameters,
   ) => Promise<GetAddressReturnType>
+  /**
+   * Creates an address mapping between new account owners and the modular wallet.
+   * @param parameters - Parameters to use. See {@link CreateAddressMappingParameters}.
+   * @returns Address mapping id. See {@link CreateAddressMappingReturnType}.
+   */
+  createAddressMapping: (
+    parameters: CreateAddressMappingParameters,
+  ) => Promise<CreateAddressMappingReturnType>
+  /**
+   * Gets the address mapping for the modular wallet.
+   * @param parameters - Parameters to use. See {@link GetAddressMappingParameters}.
+   * @returns Address mapping. See {@link GetAddressMappingReturnType}.
+   */
+  getAddressMapping: (
+    parameters: GetAddressMappingParameters,
+  ) => Promise<GetAddressMappingReturnType>
 }
 
 /**
@@ -42,5 +69,8 @@ export function modularWalletActions<transport extends Transport = Transport>(
 ): ModularWalletActions {
   return {
     getAddress: (parameters) => getAddress(client, parameters),
+    createAddressMapping: (parameters) =>
+      createAddressMapping(client, parameters),
+    getAddressMapping: (parameters) => getAddressMapping(client, parameters),
   }
 }

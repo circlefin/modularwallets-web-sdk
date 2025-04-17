@@ -16,18 +16,4 @@
  * limitations under the License.
  */
 
-import {
-  type ModularWalletActions,
-  modularWalletActions,
-} from './modularWallet'
-import { type RecoveryActions, recoveryActions } from './recovery'
-import { type RpActions, rpActions } from './rp'
-
-export {
-  ModularWalletActions,
-  modularWalletActions,
-  RecoveryActions,
-  recoveryActions,
-  RpActions,
-  rpActions,
-}
+export * from './Recovery.Mock'
