@@ -2,7 +2,7 @@ import * as React from 'react'
 import * as ReactDOM from 'react-dom/client'
 import { polygonAmoy } from 'viem/chains'
 
-import { type Hex, createPublicClient, parseEther } from 'viem'
+import { type Hex, createPublicClient, parseUnits } from 'viem'
 import {
   type P256Credential,
   type SmartAccount,
@@ -16,10 +16,14 @@ import {
   toModularTransport,
   toPasskeyTransport,
   toWebAuthnCredential,
+  encodeTransfer,
+  ContractAddress
 } from '@circle-fin/modular-wallets-core'
 
 const clientKey = import.meta.env.VITE_CLIENT_KEY as string
 const clientUrl = import.meta.env.VITE_CLIENT_URL as string
+
+const USDC_DECIMALS = 6
 
 // Create Circle transports
 const passkeyTransport = toPasskeyTransport(clientUrl, clientKey)
@@ -88,14 +92,16 @@ function Example() {
     const to = formData.get('to') as `0x${string}`
     const value = formData.get('value') as string
 
+    // Create callData for USDC transfer
+    const callData = encodeTransfer(
+      to,
+      ContractAddress.PolygonAmoy_USDC,
+      parseUnits(value, USDC_DECIMALS)
+    )
+
     const hash = await bundlerClient.sendUserOperation({
       account,
-      calls: [
-        {
-          to,
-          value: parseEther(value),
-        },
-      ],
+      calls: [callData],
       paymaster: true,
     })
     setUserOpHash(hash)
@@ -125,7 +131,7 @@ function Example() {
       <h2>Send User Operation</h2>
       <form onSubmit={sendUserOperation}>
         <input name="to" placeholder="Address" />
-        <input name="value" placeholder="Amount (ETH)" />
+        <input name="value" placeholder="Amount (USDC)" />
         <button type="submit">Send</button>
         {userOpHash && <p>User Operation Hash: {userOpHash}</p>}
         {hash && <p>Transaction Hash: {hash}</p>}

@@ -1,18 +1,22 @@
 import React, { useEffect } from "react"
-import { createPublicClient, Hex, parseEther } from "viem"
+import { createPublicClient, Hex, parseUnits } from "viem"
 
 import { isEthereumWallet } from "@dynamic-labs/ethereum"
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core"
 import { 
   toCircleSmartAccount,
   toModularTransport,
-  walletClientToLocalAccount
+  walletClientToLocalAccount,
+  encodeTransfer,
+  ContractAddress
 } from "@circle-fin/modular-wallets-core"
 import { createBundlerClient, SmartAccount } from "viem/account-abstraction"
 import { polygonAmoy } from "viem/chains"
 
 const clientKey = import.meta.env.VITE_CLIENT_KEY as string
 const clientUrl = import.meta.env.VITE_CLIENT_URL as string
+
+const USDC_DECIMALS = 6
 
 // Create Circle transports
 const modularTransport = toModularTransport(`${clientUrl}/polygonAmoy`, clientKey)
@@ -67,14 +71,16 @@ export const Example = () => {
     const to = formData.get("to") as `0x${string}`
     const value = formData.get("value") as string
 
+    // Create callData for USDC transfer
+    const callData = encodeTransfer(
+      to,
+      ContractAddress.PolygonAmoy_USDC,
+      parseUnits(value, USDC_DECIMALS)
+    )
+
     const hash = await bundlerClient.sendUserOperation({
       account,
-      calls: [
-        {
-          to,
-          value: parseEther(value),
-        },
-      ],
+      calls: [callData],
       paymaster: true,
     })
     setUserOpHash(hash)
@@ -99,7 +105,7 @@ export const Example = () => {
           <h2>Send User Operation</h2>
           <form onSubmit={sendUserOperation}>
             <input name="to" placeholder="Address" />
-            <input name="value" placeholder="Amount (ETH)" />
+            <input name="value" placeholder="Amount (USDC)" />
             <button type="submit">Send</button>
             {userOpHash && <p>User Operation Hash: {userOpHash}</p>}
             {hash && <p>Transaction Hash: {hash}</p>}

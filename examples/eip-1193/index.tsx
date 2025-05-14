@@ -3,7 +3,7 @@ import * as ReactDOM from "react-dom/client"
 import { polygonAmoy } from "viem/chains"
 import Web3 from "web3"
 
-import { type Hex, createClient, createPublicClient, http } from "viem"
+import { type Hex, createClient, createPublicClient, http, parseUnits } from "viem"
 import {
   type P256Credential,
   type SmartAccount,
@@ -18,11 +18,15 @@ import {
   toModularTransport,
   toPasskeyTransport,
   toWebAuthnCredential,
+  encodeTransfer,
+  ContractAddress,
 } from "@circle-fin/modular-wallets-core"
 
 const clientKey = import.meta.env.VITE_CLIENT_KEY as string
 const clientUrl = import.meta.env.VITE_CLIENT_URL as string
 const publicRpcUrl = import.meta.env.VITE_PUBLIC_RPC_URL as string
+
+const USDC_DECIMALS = 6
 
 // Create Circle transports
 const passkeyTransport = toPasskeyTransport(clientUrl, clientKey)
@@ -115,19 +119,27 @@ function Example() {
   const sendTx = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
 
-    if (!web3) return
+    if (!web3 || !account) return
 
     const formData = new FormData(event.currentTarget)
-    const to = formData.get("to") as `0x${string}`
+    const sendTo = formData.get("to") as `0x${string}`
     const value = formData.get("value") as string
 
     try {
       const suggestedGasPrice = ((await web3.eth.getGasPrice()) * 11n) / 10n // 10% higher than the current gas price to ensure the transaction goes through
+      
+      // Get the ERC20 transfer method data
+      const { to, data } = encodeTransfer(
+        sendTo,
+        ContractAddress.PolygonAmoy_USDC,
+        parseUnits(value, USDC_DECIMALS)
+      )
 
-      // Send tokens to the address that was input
+      // Send transaction to the USDC contract address
       const tx = await web3.eth.sendTransaction({
         to,
-        value: web3.utils.toWei(value, "ether"),
+        from: account.address,
+        data,
         gas: 53638, // Estimated gas limit for a simple transaction
         gasPrice: suggestedGasPrice,
       })
@@ -198,7 +210,7 @@ function Example() {
       <h2>Send Transaction</h2>
       <form onSubmit={sendTx}>
         <input name="to" placeholder="Address" />
-        <input name="value" placeholder="Amount (ETH)" />
+        <input name="value" placeholder="Amount (USDC)" />
         <button type="submit">Send</button>
       </form>
       <button onClick={getProviderAddress}>Get address</button>
