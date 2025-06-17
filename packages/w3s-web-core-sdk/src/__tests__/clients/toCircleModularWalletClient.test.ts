@@ -79,6 +79,7 @@ describe('Clients > toCircleModularWalletClient', () => {
         "getTransactionConfirmations": [Function],
         "getTransactionCount": [Function],
         "getTransactionReceipt": [Function],
+        "getUserOperationGasPrice": [Function],
         "key": "public",
         "multicall": [Function],
         "name": "Public Client",

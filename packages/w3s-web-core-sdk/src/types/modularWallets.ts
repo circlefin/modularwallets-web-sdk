@@ -277,3 +277,49 @@ export interface GetAddressMappingParameters {
  * The return type for getting an address mapping.
  */
 export type GetAddressMappingReturnType = AddressMappingResponse[]
+
+/**
+ * Represents gas prices for different priority levels.
+ */
+export interface GasPriceLevel {
+  /**
+   * The max priority fee per gas.
+   */
+  maxPriorityFeePerGas: string
+  /**
+   * The max fee per gas.
+   */
+  maxFeePerGas: string
+}
+
+/**
+ * The get user operation gas price response.
+ */
+export interface GetUserOperationGasPriceResponse {
+  /**
+   * The low gas price level.
+   */
+  low: GasPriceLevel
+  /**
+   * The medium gas price level.
+   */
+  medium: GasPriceLevel
+  /**
+   * The high gas price level.
+   */
+  high: GasPriceLevel
+  /**
+   * The deployed verification gas.
+   */
+  deployed?: string
+  /**
+   * The non-deployed verification gas.
+   */
+  notDeployed?: string
+}
+
+/**
+ * Response type for circle_getUserOperationGasPrice RPC method.
+ */
+export type GetUserOperationGasPriceReturnType =
+  GetUserOperationGasPriceResponse

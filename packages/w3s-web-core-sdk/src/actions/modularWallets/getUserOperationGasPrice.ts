@@ -16,6 +16,22 @@
  * limitations under the License.
  */
 
-export * from './getDefaultVerificationGasLimit'
-export * from './isWebAuthnOwner'
-export * from './walletClientToLocalAccount'
+import type {
+  GetUserOperationGasPriceReturnType,
+  GetUserOperationGasPriceRpcSchema,
+} from '../../types'
+import type { Client, Transport } from 'viem'
+
+/**
+ * Gets the user operation gas price.
+ * @param client - Client to use.
+ * @returns The user operation gas price. See {@link GetUserOperationGasPriceReturnType}.
+ */
+export async function getUserOperationGasPrice(
+  client: Client<Transport>,
+): Promise<GetUserOperationGasPriceReturnType> {
+  return await client.request<GetUserOperationGasPriceRpcSchema>({
+    method: 'circle_getUserOperationGasPrice',
+    params: [],
+  })
+}

@@ -19,3 +19,4 @@
 export * from './getAddress'
 export * from './getAddressMapping'
 export * from './createAddressMapping'
+export * from './getUserOperationGasPrice'

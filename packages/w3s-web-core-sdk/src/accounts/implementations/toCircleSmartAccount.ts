@@ -45,10 +45,10 @@ import {
 import {
   computeAddress,
   getInitializeUpgradableMSCAParams,
-  getMinimumVerificationGasLimit,
   getSenderForContract,
   getSalt,
   toReplaySafeHash,
+  getDefaultVerificationGasLimit,
 } from '../../utils'
 
 import { getModularWalletAddress } from './getModularWalletAddress'
@@ -216,18 +216,14 @@ export async function toCircleSmartAccount(
           deployed = code !== '0x' && Boolean(code)
         }
 
-        const minimumVerificationGasLimit = getMinimumVerificationGasLimit(
-          deployed,
-          client.chain?.id,
-        )
+        // Only call getDefaultVerificationGasLimit if verificationGasLimit is not provided
+        const verificationGasLimit =
+          userOperation.verificationGasLimit !== undefined
+            ? BigInt(userOperation.verificationGasLimit)
+            : BigInt(await getDefaultVerificationGasLimit(client, deployed))
 
         return Promise.resolve({
-          verificationGasLimit: BigInt(
-            Math.max(
-              Number(userOperation.verificationGasLimit ?? 0n),
-              minimumVerificationGasLimit,
-            ),
-          ),
+          verificationGasLimit,
         })
       },
     },
