@@ -50,14 +50,10 @@ import {
   toPasskeyTransport,
 } from '../../../__mocks__'
 import { toCircleSmartAccount, toWebAuthnCredential } from '../../../accounts'
-import {
-  FACTORY as factory,
-  SEPOLIA_MINIMUM_UNDEPLOY_VERIFICATION_GAS_LIMIT,
-  SEPOLIA_MINIMUM_VERIFICATION_GAS_LIMIT,
-  STUB_SIGNATURE,
-} from '../../../constants'
+import { FACTORY as factory, STUB_SIGNATURE } from '../../../constants'
 import { AccountType, WebAuthnMode } from '../../../types'
 import {
+  getDefaultVerificationGasLimit,
   getInitializeUpgradableMSCAParams,
   getSalt,
   walletClientToLocalAccount,
@@ -70,6 +66,11 @@ import type {
 } from '../../../types'
 import type { WalletClient } from 'viem'
 import type { BundlerClient, WebAuthnAccount } from 'viem/account-abstraction'
+
+// Mock the getDefaultVerificationGasLimit function
+jest.mock('../../../utils/smartAccount/getDefaultVerificationGasLimit', () => ({
+  getDefaultVerificationGasLimit: jest.fn(),
+}))
 
 const mockNavigatorGet = globalThis.window.navigator.credentials[
   'get'
@@ -394,6 +395,8 @@ describe('Accounts > implementations > toCircleSmartAccount', () => {
     describe('return value: userOperation.estimateGas', () => {
       beforeEach(() => {
         fetchMock.enableMocks()
+        // Reset getDefaultVerificationGasLimit mock
+        jest.mocked(getDefaultVerificationGasLimit).mockReset()
       })
 
       afterEach(() => {
@@ -401,7 +404,7 @@ describe('Accounts > implementations > toCircleSmartAccount', () => {
       })
 
       it.each(owners)(
-        'should return the updated verification gas limit value when the updated value is greater than the minimum value $description',
+        'should return user-provided verificationGasLimit when defined $description',
         async ({ getOwner }) => {
           expect(getOwner()).toBeDefined()
           const owner = getOwner()
@@ -410,20 +413,92 @@ describe('Accounts > implementations > toCircleSmartAccount', () => {
             owner,
           })
 
-          const mockVerificationGasLimit = 900_000n
+          const userProvidedGasLimit = 500_000n
+          const mockDefaultGasLimit = 123456
+
+          // Mock getDefaultVerificationGasLimit (should NOT be called in this case)
+          jest
+            .mocked(getDefaultVerificationGasLimit)
+            .mockResolvedValue(mockDefaultGasLimit)
 
           const estimateGas = await account.userOperation?.estimateGas?.({
-            verificationGasLimit: mockVerificationGasLimit,
+            verificationGasLimit: userProvidedGasLimit,
           })
 
+          // Should return the user-provided value, not the default
+          expect(estimateGas?.verificationGasLimit).toBe(userProvidedGasLimit)
+
+          // Verify getDefaultVerificationGasLimit was NOT called since user provided value
+          expect(getDefaultVerificationGasLimit).not.toHaveBeenCalled()
+        },
+      )
+
+      it.each(owners)(
+        'should return user-provided verificationGasLimit even when 0n $description',
+        async ({ getOwner }) => {
+          expect(getOwner()).toBeDefined()
+          const owner = getOwner()
+          const account = await toCircleSmartAccount({
+            client: client[owner.type],
+            owner,
+          })
+
+          const userProvidedGasLimit = 0n
+          const mockDefaultGasLimit = 123456
+
+          // Mock getDefaultVerificationGasLimit (should NOT be called in this case)
+          jest
+            .mocked(getDefaultVerificationGasLimit)
+            .mockResolvedValue(mockDefaultGasLimit)
+
+          const estimateGas = await account.userOperation?.estimateGas?.({
+            verificationGasLimit: userProvidedGasLimit,
+          })
+
+          // Should return the user-provided value (0n), not the default
+          expect(estimateGas?.verificationGasLimit).toBe(userProvidedGasLimit)
+
+          // Verify getDefaultVerificationGasLimit was NOT called since user provided value
+          expect(getDefaultVerificationGasLimit).not.toHaveBeenCalled()
+        },
+      )
+
+      it.each(owners)(
+        'should return default verificationGasLimit when user value is undefined $description',
+        async ({ getOwner }) => {
+          expect(getOwner()).toBeDefined()
+          const owner = getOwner()
+          const account = await toCircleSmartAccount({
+            client: client[owner.type],
+            owner,
+          })
+
+          const mockDefaultGasLimit = 789012
+
+          // Mock getDefaultVerificationGasLimit to return expected values
+          jest
+            .mocked(getDefaultVerificationGasLimit)
+            .mockResolvedValue(mockDefaultGasLimit)
+
+          const estimateGas = await account.userOperation?.estimateGas?.({
+            // verificationGasLimit is undefined
+          })
+
+          // Should return the default value
           expect(estimateGas?.verificationGasLimit).toBe(
-            BigInt(mockVerificationGasLimit),
+            BigInt(mockDefaultGasLimit),
+          )
+
+          // Verify getDefaultVerificationGasLimit was called with proper parameters
+          expect(getDefaultVerificationGasLimit).toHaveBeenCalledWith(
+            client[owner.type],
+            true,
           )
         },
       )
 
       it.each(owners)(
-        'should return the minimum verification gas limit value when the updated value is less than the minimum value $description',
+        'should return default verificationGasLimit when no userOperation properties provided $description',
         async ({ getOwner }) => {
           expect(getOwner()).toBeDefined()
           const owner = getOwner()
@@ -432,39 +507,36 @@ describe('Accounts > implementations > toCircleSmartAccount', () => {
             owner,
           })
 
-          const estimateGas = await account.userOperation?.estimateGas?.({
-            verificationGasLimit: 0n,
-          })
+          const mockDefaultGasLimit = 345678
 
-          expect(estimateGas?.verificationGasLimit).toBe(
-            BigInt(SEPOLIA_MINIMUM_VERIFICATION_GAS_LIMIT),
-          )
-        },
-      )
-
-      it.each(owners)(
-        'should return the minimum verification gas limit when the updated value is undefined $description',
-        async ({ getOwner }) => {
-          expect(getOwner()).toBeDefined()
-          const owner = getOwner()
-          const account = await toCircleSmartAccount({
-            client: client[owner.type],
-            owner,
-          })
+          // Mock getDefaultVerificationGasLimit to return expected values
+          jest
+            .mocked(getDefaultVerificationGasLimit)
+            .mockResolvedValue(mockDefaultGasLimit)
 
           const estimateGas = await account.userOperation?.estimateGas?.({})
 
+          // Should return the default value
           expect(estimateGas?.verificationGasLimit).toBe(
-            BigInt(SEPOLIA_MINIMUM_VERIFICATION_GAS_LIMIT),
+            BigInt(mockDefaultGasLimit),
+          )
+
+          // Verify getDefaultVerificationGasLimit was called with proper parameters
+          expect(getDefaultVerificationGasLimit).toHaveBeenCalledWith(
+            client[owner.type],
+            true,
           )
         },
       )
     })
 
-    describe('return value: userOperation.estimateGas with undeploy smart wallet cases', () => {
+    describe('return value: userOperation.estimateGas with undeployed smart wallet', () => {
       beforeEach(() => {
         fetchMock.enableMocks()
+        // Reset getDefaultVerificationGasLimit mock
+        jest.mocked(getDefaultVerificationGasLimit).mockReset()
 
+        // Mock getCode to return '0x' (indicating undeployed contract)
         const mockGetCode = jest.fn().mockResolvedValue('0x')
         const types: string[] = [AccountType.WebAuthn, AccountType.Local]
         types.forEach((item, _) => {
@@ -480,7 +552,7 @@ describe('Accounts > implementations > toCircleSmartAccount', () => {
       })
 
       it.each(owners)(
-        `should return the minimum $description`,
+        'should call getDefaultVerificationGasLimit with deployed=false for undeployed wallet $description',
         async ({ getOwner }) => {
           expect(getOwner()).toBeDefined()
           const owner = getOwner()
@@ -489,17 +561,32 @@ describe('Accounts > implementations > toCircleSmartAccount', () => {
             owner,
           })
 
+          const mockDefaultGasLimit = 654321
+
+          // Mock getDefaultVerificationGasLimit to return expected values
+          jest
+            .mocked(getDefaultVerificationGasLimit)
+            .mockResolvedValue(mockDefaultGasLimit)
+
           const estimateGas = await account.userOperation?.estimateGas?.({
-            verificationGasLimit: 0n,
+            // No verificationGasLimit provided, should use default
           })
+
+          // Should return the default value
           expect(estimateGas?.verificationGasLimit).toBe(
-            BigInt(SEPOLIA_MINIMUM_UNDEPLOY_VERIFICATION_GAS_LIMIT),
+            BigInt(mockDefaultGasLimit),
+          )
+
+          // Verify getDefaultVerificationGasLimit was called with deployed=false
+          expect(getDefaultVerificationGasLimit).toHaveBeenCalledWith(
+            client[owner.type],
+            false,
           )
         },
       )
 
       it.each(owners)(
-        `should return the minimum undeploy verification gas limit constant when the address hasn't been deployed and the passed-in value is less than the default value $description`,
+        'should honor user-provided verificationGasLimit even for undeployed wallet $description',
         async ({ getOwner }) => {
           expect(getOwner()).toBeDefined()
           const owner = getOwner()
@@ -507,18 +594,29 @@ describe('Accounts > implementations > toCircleSmartAccount', () => {
             client: client[owner.type],
             owner,
           })
+
+          const userProvidedGasLimit = 1_000_000n
+          const mockDefaultGasLimit = 654321
+
+          // Mock getDefaultVerificationGasLimit (should NOT be called when user provides value)
+          jest
+            .mocked(getDefaultVerificationGasLimit)
+            .mockResolvedValue(mockDefaultGasLimit)
+
           const estimateGas = await account.userOperation?.estimateGas?.({
-            verificationGasLimit: 0n,
+            verificationGasLimit: userProvidedGasLimit,
           })
 
-          expect(estimateGas?.verificationGasLimit).toBe(
-            BigInt(SEPOLIA_MINIMUM_UNDEPLOY_VERIFICATION_GAS_LIMIT),
-          )
+          // Should return the user-provided value, not the default
+          expect(estimateGas?.verificationGasLimit).toBe(userProvidedGasLimit)
+
+          // Verify getDefaultVerificationGasLimit was NOT called since user provided value
+          expect(getDefaultVerificationGasLimit).not.toHaveBeenCalled()
         },
       )
 
       it.each(owners)(
-        `should return the passed-in verification gas limit value when the address hasn't been deployed and the passed-in value is greater than the default value $description`,
+        'should honor user-provided 0n verificationGasLimit for undeployed wallet $description',
         async ({ getOwner }) => {
           expect(getOwner()).toBeDefined()
           const owner = getOwner()
@@ -527,15 +625,23 @@ describe('Accounts > implementations > toCircleSmartAccount', () => {
             owner,
           })
 
-          const mockVerificationGasLimit = 2_000_000n
+          const userProvidedGasLimit = 0n
+          const mockDefaultGasLimit = 654321
+
+          // Mock getDefaultVerificationGasLimit (should NOT be called when user provides value)
+          jest
+            .mocked(getDefaultVerificationGasLimit)
+            .mockResolvedValue(mockDefaultGasLimit)
 
           const estimateGas = await account.userOperation?.estimateGas?.({
-            verificationGasLimit: mockVerificationGasLimit,
+            verificationGasLimit: userProvidedGasLimit,
           })
 
-          expect(estimateGas?.verificationGasLimit).toBe(
-            BigInt(mockVerificationGasLimit),
-          )
+          // Should return the user-provided value (0n), not the default
+          expect(estimateGas?.verificationGasLimit).toBe(userProvidedGasLimit)
+
+          // Verify getDefaultVerificationGasLimit was NOT called since user provided value
+          expect(getDefaultVerificationGasLimit).not.toHaveBeenCalled()
         },
       )
     })

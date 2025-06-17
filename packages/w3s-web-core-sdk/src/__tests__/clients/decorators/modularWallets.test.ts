@@ -26,6 +26,7 @@ import {
   GetAddressMappingResult,
   GetAddressMockParameters,
   GetAddressResult,
+  GetUserOperationGasPriceResult,
   toModularTransport,
 } from '../../../__mocks__'
 import { modularWalletActions } from '../../../clients'
@@ -58,6 +59,7 @@ describe('Client > Decorators > modularWallets', () => {
         "createAddressMapping": [Function],
         "getAddress": [Function],
         "getAddressMapping": [Function],
+        "getUserOperationGasPrice": [Function],
       }
     `)
   })
@@ -96,6 +98,19 @@ describe('Client > Decorators > modularWallets', () => {
     expect(client.request).toHaveBeenCalledWith({
       method: 'circle_getAddressMapping',
       params: [GetAddressMappingMockParameters],
+    })
+  })
+
+  it('should call circle_getUserOperationGasPrice RPC method', async () => {
+    fetchMock.mockResponseOnce(
+      getJsonRpcStringifyResponse(GetUserOperationGasPriceResult),
+    )
+
+    await actions.getUserOperationGasPrice()
+
+    expect(client.request).toHaveBeenCalledWith({
+      method: 'circle_getUserOperationGasPrice',
+      params: [],
     })
   })
 })

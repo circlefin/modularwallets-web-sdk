@@ -41,6 +41,7 @@ import {
   GetUserOperationResult,
   MaxPriorityFeePerGasResult,
   SendUserOperationResult,
+  GetUserOperationGasPriceResult,
 } from './ModularWallets.Mock'
 
 import type {
@@ -186,6 +187,13 @@ export default class MockModularWalletsProvider<
           await getJsonRpcResponse<API, Method, ResultType>(
             payload,
             GetAddressMappingResult,
+          )
+        ).result
+      case 'circle_getUserOperationGasPrice':
+        return (
+          await getJsonRpcResponse<API, Method, ResultType>(
+            payload,
+            GetUserOperationGasPriceResult,
           )
         ).result
       case 'pm_getPaymasterData':

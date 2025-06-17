@@ -22,6 +22,7 @@ import type {
   GetAddressMappingParameters,
   GetAddressMappingReturnType,
   GetAddressReturnType,
+  GetUserOperationGasPriceReturnType,
   InitialOwnershipConfiguration,
 } from './modularWallets'
 import type {
@@ -105,6 +106,15 @@ export type GetAddressMappingRpcSchema = {
   ReturnType: GetAddressMappingReturnType
 }
 
+/**
+ * Gets the gas prices for user operations.
+ */
+export type GetUserOperationGasPriceRpcSchema = {
+  Method: 'circle_getUserOperationGasPrice'
+  Parameters?: []
+  ReturnType: GetUserOperationGasPriceReturnType
+}
+
 export type RpRpcSchema = [
   GetLoginOptionsRpcSchema,
   GetLoginVerificationRpcSchema,
@@ -116,4 +126,5 @@ export type ModularWalletRpcSchema = [
   GetAddressRpcSchema,
   CreateAddressMappingRpcSchema,
   GetAddressMappingRpcSchema,
+  GetUserOperationGasPriceRpcSchema,
 ]

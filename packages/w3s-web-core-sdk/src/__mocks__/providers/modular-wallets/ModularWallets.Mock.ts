@@ -470,3 +470,23 @@ export const GetAddressMappingResult: GetAddressMappingReturnType = [
     updateDate: '2024-11-05T01:27:17Z',
   },
 ]
+
+/**
+ * Mocks for ModularWallets rpc responses - circle_getUserOperationGasPrice.
+ */
+export const GetUserOperationGasPriceResult = {
+  low: {
+    maxPriorityFeePerGas: '73333333328',
+    maxFeePerGas: '73333333358',
+  },
+  medium: {
+    maxPriorityFeePerGas: '87999999994',
+    maxFeePerGas: '88000000024',
+  },
+  high: {
+    maxPriorityFeePerGas: '131999999991',
+    maxFeePerGas: '132000000021',
+  },
+  deployed: '600000',
+  notDeployed: '1500000',
+}

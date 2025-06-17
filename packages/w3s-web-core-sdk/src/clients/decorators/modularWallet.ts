@@ -21,6 +21,7 @@ import {
   createAddressMapping,
   getAddress,
   getAddressMapping,
+  getUserOperationGasPrice,
 } from '../../actions'
 
 import type {
@@ -29,6 +30,7 @@ import type {
   GetAddressReturnType,
   GetAddressMappingParameters,
   GetAddressMappingReturnType,
+  GetUserOperationGasPriceReturnType,
 } from '../../types'
 import type { Client, Transport } from 'viem'
 
@@ -57,6 +59,11 @@ export type ModularWalletActions = {
   getAddressMapping: (
     parameters: GetAddressMappingParameters,
   ) => Promise<GetAddressMappingReturnType>
+  /**
+   * Gets the gas prices for user operations.
+   * @returns Gas prices. See {@link GetUserOperationGasPriceReturnType}.
+   */
+  getUserOperationGasPrice: () => Promise<GetUserOperationGasPriceReturnType>
 }
 
 /**
@@ -72,5 +79,6 @@ export function modularWalletActions<transport extends Transport = Transport>(
     createAddressMapping: (parameters) =>
       createAddressMapping(client, parameters),
     getAddressMapping: (parameters) => getAddressMapping(client, parameters),
+    getUserOperationGasPrice: () => getUserOperationGasPrice(client),
   }
 }
