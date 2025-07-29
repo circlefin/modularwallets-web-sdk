@@ -20,6 +20,8 @@ import { v4 as uuidv4 } from 'uuid'
 import { EIP1193ProviderRpcError } from 'viem'
 import { ResponseError } from 'web3'
 
+import { isChromeExtension } from './isChromeExtension'
+
 import type {
   JsonRpcResponseWithError,
   JsonRpcResponseWithResult,
@@ -47,13 +49,22 @@ export async function fetchFromApi<
   payload: Web3APIPayload<API, Method>,
   requestOptions?: RequestInit,
 ): Promise<JsonRpcResponseWithResult<ResultType>> {
+  const hostname = window?.location?.hostname || 'unknown'
+
+  /**
+   * Determine the URI for the X-AppInfo header.
+   * Chrome extensions require the chrome-extension:// protocol format
+   * to properly identify the extension context to the API.
+   */
+  const uri = isChromeExtension() ? `chrome-extension://${hostname}` : hostname
+
   const fetchResponse: Response = await fetch(clientUrl, {
     ...requestOptions,
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${clientKey}`,
-      'X-AppInfo': `platform=web;version=${SDK_VERSION};uri=${window?.location?.hostname}`,
+      'X-AppInfo': `platform=web;version=${SDK_VERSION};uri=${uri}`,
     },
     body: JSON.stringify({
       ...payload,

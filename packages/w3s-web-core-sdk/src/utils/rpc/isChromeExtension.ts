@@ -16,9 +16,16 @@
  * limitations under the License.
  */
 
-export * from './errorCodes'
-export * from './fetchFromApi'
-export * from './isCircleUrl'
-export * from './validateClientUrl'
-export * from './isChromeExtension'
-export * from './webAuthnHelpers'
+/**
+ * Detects if the current execution context is within a Chrome extension.
+ *
+ * Chrome extensions have specific WebAuthn API limitations that require
+ * modifications to credential creation and request options.
+ * @returns True if running in a Chrome extension context, false otherwise.
+ */
+export function isChromeExtension(): boolean {
+  return (
+    typeof window !== 'undefined' &&
+    window.location?.protocol === 'chrome-extension:'
+  )
+}

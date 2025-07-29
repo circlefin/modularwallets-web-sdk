@@ -21,9 +21,14 @@ import { EIP1193ProviderRpcError } from 'viem'
 import { ResponseError } from 'web3'
 
 import { fetchFromApi } from '../../../utils'
+import { isChromeExtension } from '../../../utils/rpc/isChromeExtension'
 
 jest.mock('uuid', () => ({
   v4: jest.fn().mockReturnValue('mocked-uuid'),
+}))
+
+jest.mock('../../../utils/rpc/isChromeExtension', () => ({
+  isChromeExtension: jest.fn(),
 }))
 
 beforeAll(() => {
@@ -132,5 +137,86 @@ describe('Utils > rpc > fetchFromApi', () => {
     expect(response).toEqual(mockResponse)
 
     jest.restoreAllMocks()
+  })
+
+  describe('Chrome extension support', () => {
+    const mockIsChromeExtension = isChromeExtension as jest.MockedFunction<
+      typeof isChromeExtension
+    >
+    const originalWindow = global.window
+
+    beforeEach(() => {
+      Object.defineProperty(global, 'window', {
+        value: {
+          location: {
+            hostname: 'test-extension-id',
+          },
+        },
+        writable: true,
+      })
+    })
+
+    afterEach(() => {
+      global.window = originalWindow
+      mockIsChromeExtension.mockReset()
+    })
+
+    it('should use chrome-extension URI format when in Chrome extension context', async () => {
+      mockIsChromeExtension.mockReturnValue(true)
+
+      const mockResponse = { jsonrpc: '2.0', id: 1, result: '0x1' }
+      fetchMock.mockResponseOnce(JSON.stringify(mockResponse), { status: 200 })
+
+      await fetchFromApi(mockClientUrl, mockClientKey, mockPayload)
+
+      const callArgs = fetchMock.mock.calls[0]
+      const requestOptions = callArgs?.[1]
+      const headers = requestOptions?.headers as Record<string, string>
+
+      expect(headers['X-AppInfo']).toContain(
+        'chrome-extension://test-extension-id',
+      )
+    })
+
+    it('should use regular hostname when not in Chrome extension context', async () => {
+      mockIsChromeExtension.mockReturnValue(false)
+
+      const mockResponse = { jsonrpc: '2.0', id: 1, result: '0x1' }
+      fetchMock.mockResponseOnce(JSON.stringify(mockResponse), { status: 200 })
+
+      await fetchFromApi(mockClientUrl, mockClientKey, mockPayload)
+
+      const callArgs = fetchMock.mock.calls[0]
+      const requestOptions = callArgs?.[1]
+      const headers = requestOptions?.headers as Record<string, string>
+      const appInfo = headers['X-AppInfo']
+
+      expect(appInfo).toContain('uri=test-extension-id')
+      expect(appInfo).not.toContain('chrome-extension://')
+    })
+
+    it('should handle unknown hostname gracefully', async () => {
+      mockIsChromeExtension.mockReturnValue(false)
+
+      Object.defineProperty(global, 'window', {
+        value: {
+          location: {
+            hostname: undefined,
+          },
+        },
+        writable: true,
+      })
+
+      const mockResponse = { jsonrpc: '2.0', id: 1, result: '0x1' }
+      fetchMock.mockResponseOnce(JSON.stringify(mockResponse), { status: 200 })
+
+      await fetchFromApi(mockClientUrl, mockClientKey, mockPayload)
+
+      const callArgs = fetchMock.mock.calls[0]
+      const requestOptions = callArgs?.[1]
+      const headers = requestOptions?.headers as Record<string, string>
+
+      expect(headers['X-AppInfo']).toContain('uri=unknown')
+    })
   })
 })
