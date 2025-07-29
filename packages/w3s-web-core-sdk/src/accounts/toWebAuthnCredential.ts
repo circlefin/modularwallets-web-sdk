@@ -25,7 +25,11 @@ import {
 
 import { createRpClient } from '../clients'
 import { WebAuthnMode } from '../types'
-import { parseBase64EncodedPublicKey } from '../utils'
+import {
+  parseBase64EncodedPublicKey,
+  adaptCredentialCreationOptions,
+  adaptCredentialRequestOptions,
+} from '../utils'
 
 import type { RpClient } from '../clients'
 import type {
@@ -78,9 +82,14 @@ async function startRegistration(
     username: username ?? '',
   })
 
+  // Convert to PublicKeyCredentialCreationOptions and adapt for different contexts
+  const publicKeyOpts = adaptCredentialCreationOptions(
+    getCredentialCreationOptions(registrationOptions),
+  )
+
   // Start registration
   const credential = (await createFn({
-    publicKey: getCredentialCreationOptions(registrationOptions),
+    publicKey: publicKeyOpts,
   })) as PublicKeyCredential
   if (credential == null) throw new Error('No credential created.')
 
@@ -128,9 +137,14 @@ async function startAuthentication(
     userId: credentialId ?? '',
   })
 
+  // Convert to PublicKeyCredentialRequestOptions and adapt for different contexts
+  const publicKeyReq = adaptCredentialRequestOptions(
+    getCredentialRequestOptions(loginOptions),
+  )
+
   // Start authentication (login)
   const credential = (await getFn({
-    publicKey: getCredentialRequestOptions(loginOptions),
+    publicKey: publicKeyReq,
   })) as PublicKeyCredential
   if (credential == null) throw new Error('No credential available.')
 
