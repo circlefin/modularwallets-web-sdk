@@ -1,5 +1,7 @@
 # w3s-web-core-sdk
 
+[![Test Coverage](https://gist.githubusercontent.com/circle-ops-repo-updater/e7bd19f4fa4b938846ab8dfd3d0fdb76/raw/badge_080600a2cd10.svg)](https://sonarqube.circle.com/component_measures?metric=coverage&view=list&id=circlefin_w3s-web-core-sdk_7e01a87f-7793-4147-b755-e0717a9ed92e)
+
 Repository for the Circle Modular Wallet Web SDK (*aka.* BW Web SDK or Buidl Wallet Web SDK)
 
 ## Examples
