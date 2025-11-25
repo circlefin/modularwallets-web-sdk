@@ -33,6 +33,10 @@ export enum ContractAddress {
   Base_USDC = '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913',
   BaseSepolia_USDC = '0x036CbD53842c5426634e7929541eC2318f3dCF7e',
 
+  // Monad Tokens
+  Monad_USDC = '0x754704bc059f8c67012fed69bc8a327a5aafb603',
+  MonadTestnet_USDC = '0x534b2f3A21130d7a60830c2Df862319e593943A3',
+
   // Optimism Tokens
   Optimism_USDC = '0x0b2c639c533813f4aa9d7837caf62653d097ff85',
   Optimism_OP = '0x4200000000000000000000000000000000000042',
