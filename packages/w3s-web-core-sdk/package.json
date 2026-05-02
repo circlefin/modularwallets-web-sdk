@@ -23,7 +23,7 @@
     "test:coverage": "jest --coverage"
   },
   "dependencies": {
-    "uuid": "^11.0.3",
+    "uuid": "^14.0.0",
     "viem": "^2.21.27",
     "web3": "^4.13.0",
     "webauthn-p256": "0.0.5"
