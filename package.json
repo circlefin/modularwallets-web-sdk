@@ -15,7 +15,7 @@
     "@types/jest": "^29.5.12",
     "@types/node": "^22.5.3",
     "ts-jest": "^29.2.5",
-    "turbo": "^2.5.0",
+    "turbo": "^2.9.14",
     "typescript": "^5.8.2"
   },
   "engines": {
