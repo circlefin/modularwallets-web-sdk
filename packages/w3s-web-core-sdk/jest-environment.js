@@ -45,6 +45,11 @@ class CustomTestEnvironment extends TestEnvironment {
       this.global.TextDecoder = TextDecoder
     }
   }
+
+  async teardown() {
+    // Close jsdom window and dispose fake timers (see jest-environment-jsdom).
+    await super.teardown()
+  }
 }
 
 export default CustomTestEnvironment

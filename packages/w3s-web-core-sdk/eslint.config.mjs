@@ -16,7 +16,8 @@
  * limitations under the License.
  */
 
-export * from './getLoginOptions'
-export * from './getLoginVerification'
-export * from './getRegistrationOptions'
-export * from './getRegistrationVerification'
+import { createEslintConfig } from '@templates/eslint-config'
+
+export default createEslintConfig({
+  tsconfigRootDir: import.meta.dirname,
+})

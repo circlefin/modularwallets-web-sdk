@@ -1,13 +1,13 @@
-/**
- * Copyright 2025 Circle Internet Group, Inc. All rights reserved.
+/*
+ * Copyright (c) 2026, Circle Internet Group, Inc. All rights reserved.
  *
- * SPDX-License-Identifier: Apache-2.0.
+ * SPDX-License-Identifier: Apache-2.0
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at.
+ * You may obtain a copy of the License at
  *
- * Http://www.apache.org/licenses/LICENSE-2.0.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -49,11 +49,11 @@ export async function registerRecoveryAddress(
   client: Client<Transport, Chain | undefined, SmartAccount | undefined>,
   params: RegisterRecoveryAddressParameters,
 ): Promise<SendUserOperationReturnType> {
-  if (!client.account && !params.account) {
+  const account = client.account ?? params.account
+  if (!account) {
     throw new Error('Account is required')
   }
 
-  const account = client.account || (params.account as SmartAccount)
   const { recoveryAddress, ...userOp } = params
 
   // Step 1: Create a mapping between the MSCA address and the recovery address
@@ -69,7 +69,7 @@ export async function registerRecoveryAddress(
         },
       ],
     })
-  } catch (error) {
+  } catch (error: unknown) {
     const addressMappingAlreadyExistsError =
       error instanceof RpcError && error.code === ErrorCodes.ALREADY_KNOWN
 
@@ -80,6 +80,7 @@ export async function registerRecoveryAddress(
     if (!addressMappingAlreadyExistsError) {
       throw new Error(
         'Failed to register the recovery address. Please try again.',
+        { cause: error },
       )
     }
   }
