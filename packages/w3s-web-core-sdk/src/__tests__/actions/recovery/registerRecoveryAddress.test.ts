@@ -1,13 +1,13 @@
-/**
- * Copyright 2025 Circle Internet Group, Inc. All rights reserved.
+/*
+ * Copyright (c) 2026, Circle Internet Group, Inc. All rights reserved.
  *
- * SPDX-License-Identifier: Apache-2.0.
+ * SPDX-License-Identifier: Apache-2.0
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at.
+ * You may obtain a copy of the License at
  *
- * Http://www.apache.org/licenses/LICENSE-2.0.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -228,5 +228,89 @@ describe('Actions > recovery > registerRecoveryAddress', () => {
 
     // Verify sendUserOperation was not called after the error
     expect(viemAccountAbstraction.sendUserOperation).not.toHaveBeenCalled()
+  })
+
+  it('should throw when createAddressMapping fails with RpcError using a different code', async () => {
+    const mockCreateAddressMapping = createAddressMapping as jest.Mock
+    const rpcError = new RpcError(new Error('Internal error'), {
+      code: -32603,
+      shortMessage: 'Internal error',
+    })
+    mockCreateAddressMapping.mockRejectedValue(rpcError)
+
+    await expect(
+      registerRecoveryAddress(client, {
+        account,
+        recoveryAddress: RecoveryAddressMock,
+      }),
+    ).rejects.toThrow(
+      'Failed to register the recovery address. Please try again.',
+    )
+
+    expect(viemAccountAbstraction.sendUserOperation).not.toHaveBeenCalled()
+  })
+
+  it('should pass through additional userOp parameters to sendUserOperation', async () => {
+    const additionalParams = {
+      maxFeePerGas: 1_000_000_000n,
+      maxPriorityFeePerGas: 100_000_000n,
+    }
+
+    await registerRecoveryAddress(client, {
+      account,
+      recoveryAddress: RecoveryAddressMock,
+      ...additionalParams,
+    })
+
+    expect(viemAccountAbstraction.sendUserOperation).toHaveBeenCalledWith(
+      client,
+      expect.objectContaining({
+        callData: '0x123456',
+        account,
+        ...additionalParams,
+      }),
+    )
+  })
+
+  it('should propagate errors from sendUserOperation', async () => {
+    const errorMessage = 'User operation failed'
+    jest
+      .spyOn(viemAccountAbstraction, 'sendUserOperation')
+      .mockRejectedValueOnce(new Error(errorMessage))
+
+    await expect(
+      registerRecoveryAddress(client, {
+        account,
+        recoveryAddress: RecoveryAddressMock,
+      }),
+    ).rejects.toThrow(errorMessage)
+  })
+
+  it('should prefer client.account when both client and params provide an account', async () => {
+    const clientAccount = account
+    const paramsAccount = {
+      ...account,
+      address: '0x1111111111111111111111111111111111111111',
+    } as viemAccountAbstraction.SmartAccount
+    const clientWithAccount = { ...client, account: clientAccount }
+
+    await registerRecoveryAddress(clientWithAccount, {
+      account: paramsAccount,
+      recoveryAddress: RecoveryAddressMock,
+    })
+
+    expect(createAddressMapping).toHaveBeenCalledWith(
+      clientWithAccount,
+      expect.objectContaining({
+        walletAddress: clientAccount.address,
+      }),
+    )
+
+    expect(viemAccountAbstraction.sendUserOperation).toHaveBeenCalledWith(
+      clientWithAccount,
+      expect.objectContaining({
+        account: paramsAccount,
+      }),
+    )
   })
 })

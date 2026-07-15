@@ -1,4 +1,0 @@
-coverage
-dist
-.rollup.cache/*
-.jest
