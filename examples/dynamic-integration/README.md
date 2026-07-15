@@ -1,66 +1,87 @@
 # Dynamic Integration Example
 
-This example Vite application demonstrates how to integrate [Dynamic](https://www.dynamic.xyz/)'s SDK using an EOA account.
+This example Vite application demonstrates how to integrate [Dynamic](https://www.dynamic.xyz/)'s SDK with Circle Modular Wallets. A user connects an EOA through Dynamic; the app derives a Circle smart account on Polygon Amoy and can send a gas-sponsored USDC user operation.
 
-## Run the example app
+## Prerequisites
 
-Please follow the instructions to run the example app on your local machine.
+- A [Circle Modular Wallets](https://console.circle.com/wallets/modular/configurator) client configured for **Polygon Amoy**
+- A [Dynamic](https://app.dynamic.xyz/dashboard/overview) project (use the **Sandbox** environment for local development)
 
-### Environment Variables
+## Environment variables
 
-Before you start to run the app, you need to make sure that all environment variables are configured correctly.
-
-Make a copy of `.env.example` and rename it to `.env`.
-
-Under `.env`, make sure the following environment variables are configured properly:
-
-- `VITE_CLIENT_KEY`: Paste your Client Key here. You can create one in [Circle Developer Console](https://console.circle.com/wallets/modular/configurator).
-- `VITE_CLIENT_URL`: Paste the Client URL here. You can copy it from [Circle Developer Console](https://console.circle.com/wallets/modular/configurator).
-- `VITE_DYNAMIC_ENV_ID`: Paste the Dynamic Environment ID here. You can copy it from [Dynamic Console](https://app.dynamic.xyz/dashboard/overview).
-
-Once you have these environment variables setup, you can now follow the steps below to run the app locally.
-
-### Install dependencies
-
-You first need to make sure you have followed the [README](https://github.com/circlefin/w3s-web-core-sdk/blob/master/README.md) under project root and have installed all dependencies under root folder:
+Copy `.env.example` to `.env` in this folder (`examples/dynamic-integration/.env`):
 
 ```bash
-$ pnpm install
+cp .env.example .env
 ```
 
-#### Important: Build the SDK
+| Variable | Description |
+| --- | --- |
+| `VITE_CLIENT_KEY` | Client Key from the Circle Developer Console |
+| `VITE_CLIENT_URL` | Base Client URL from the Circle Developer Console — **without** the chain suffix |
+| `VITE_DYNAMIC_ENV_ID` | Sandbox Environment ID from the Dynamic dashboard |
 
-Since this project uses pnpm workspaces, you must build the SDK packages before running the example:
+> [!IMPORTANT]
+> `VITE_CLIENT_URL` must be a full `https://...` URL. The app appends `/polygonAmoy` internally. If this variable is empty, you will see `InvalidProviderError: Provider with url "/polygonAmoy" is not set or invalid`.
+
+Example `.env` shape (use your own credentials):
+
+```env
+VITE_CLIENT_KEY=your-client-key
+VITE_CLIENT_URL=https://modular-sdk.circle.com/v1/rpc/w3s/buidl
+VITE_DYNAMIC_ENV_ID=your-dynamic-sandbox-environment-id
+```
+
+Restart `pnpm dev` after changing `.env`.
+
+## Dynamic dashboard setup
+
+Configure the **Sandbox** environment that matches `VITE_DYNAMIC_ENV_ID`:
+
+1. **Security → Allowed CORS origins** — add `http://localhost:5173` (include the port Vite prints)
+2. **Log in** — enable at least one sign-in method (email, social, or external wallet)
+3. **Chains & Networks** — enable **EVM** and **Polygon Amoy**
+4. **Wallets** — enable **MetaMask** and/or **WalletConnect**, or enable **Embedded Wallets** with Polygon Amoy
+
+The app already wires up Dynamic per their React quickstart in `App.tsx` (`DynamicContextProvider`, `EthereumWalletConnectors`, `DynamicWidget`).
+
+## Install and run
+
+From the repository root:
 
 ```bash
-# From the project root directory
-$ pnpm build
+pnpm install
+pnpm build
 ```
 
-This will generate the necessary distribution files that this example depends on.
-
-Now you need to go to this example folder:
+Then from this folder:
 
 ```bash
-$ cd examples/dynamic-integration
+cd examples/dynamic-integration
+pnpm dev
 ```
 
-Once you are under the example folder, install all dependencies for the app:
+Open `http://localhost:5173/`.
 
-```bash
-$ pnpm install
-```
+## Smoke test
 
-### Run the app
+1. Click the Dynamic connect button — the modal should open without CORS errors in the browser console
+2. Sign in and connect an EVM wallet
+3. Confirm an **Address:** line appears (Circle smart account derived from the Dynamic EOA)
+4. Optional: submit the USDC transfer form (requires Amoy USDC and paymaster enabled on your Circle client)
 
-To run the app locally:
+## Troubleshooting
 
-```bash
-$ pnpm dev
-```
+| Symptom | Likely cause |
+| --- | --- |
+| `InvalidProviderError` for `/polygonAmoy` | `VITE_CLIENT_URL` missing or `.env` not in this folder |
+| CORS errors to `app.dynamicauth.com` | Add `http://localhost:5173` to Dynamic **Allowed CORS origins** (Sandbox env) |
+| Connect button renders but modal fails | Dynamic SDK did not initialize — check CORS and `VITE_DYNAMIC_ENV_ID` |
+| `This wallet is not an Ethereum wallet` | Connected a non-EVM wallet; enable EVM connectors in Dynamic |
+| Stuck on "Loading..." after connect | `getWalletClient()` failed — ensure Polygon Amoy is enabled in Dynamic |
+| User operation fails | Circle-side issue (paymaster, funding, or Amoy USDC balance) |
 
-Now you should be able to see your app up and running in your browser at: `http://localhost:5173/`.
+## Important notes
 
-### Important Notes
-
-**Ensure the installed SDK version is greater than or equal to `1.0.5`**
+- Ensure the installed SDK version is greater than or equal to `1.0.5`
+- `.env` lives in `examples/dynamic-integration/`, not the repository root

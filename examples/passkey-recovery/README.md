@@ -25,7 +25,7 @@ Once you have these environment variables setup, you can now follow the steps be
 
 ### Install dependencies
 
-You first need to make sure you have followed the [README](https://github.com/circlefin/w3s-web-core-sdk/blob/master/README.md) under project root and have installed all dependencies under root folder:
+You first need to make sure you have followed the [README](https://github.com/circlefin/modularwallets-web-sdk/blob/master/README.md) under project root and have installed all dependencies under root folder:
 
 ```bash
 $ pnpm install
