@@ -198,13 +198,19 @@ describe('Providers > eip-1193 > EIP1193Provider > rpc methods', () => {
       method: 'personal_sign',
       params: PersonalSignParams,
     }
+    const signMessageSpy = jest.spyOn(account, 'signMessage')
 
     const response = await provider.request<
       string,
       typeof PersonalSignResponse
     >(mockPayload)
 
+    expect(signMessageSpy).toHaveBeenCalledWith({
+      message: { raw: PersonalSignParams[0] },
+    })
     expect(response).toEqual(PersonalSignResponse)
+
+    signMessageSpy.mockRestore()
   })
 
   it('should throw an error when the to parameter is not provided for eth_sendTransaction', async () => {
