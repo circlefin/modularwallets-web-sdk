@@ -76,7 +76,7 @@ export default class EIP1193Provider<
         await this.validateAddress(address)
 
         const result = await this.bundlerClient.account!.signMessage({
-          message: challenge,
+          message: { raw: challenge },
         })
 
         return this.getResponse(result, payload)
