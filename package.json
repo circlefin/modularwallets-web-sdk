@@ -8,25 +8,20 @@
     "lint": "turbo run lint",
     "lint:report": "turbo run lint:report",
     "check:type": "turbo run check:type",
+    "copyright:check": "scripts/check-copyright-header.sh --check --all",
+    "copyright:fix": "scripts/check-copyright-header.sh --all",
     "test": "turbo run test",
     "test:coverage": "turbo run test:coverage"
   },
   "devDependencies": {
-    "@types/jest": "^29.5.12",
-    "@types/node": "^22.5.3",
-    "ts-jest": "^29.2.5",
-    "turbo": "^2.5.0",
-    "typescript": "^5.8.2"
+    "@types/jest": "29.5.14",
+    "@types/node": "^24.0.0",
+    "ts-jest": "29.4.11",
+    "turbo": "2.9.16",
+    "typescript": "5.8.2"
   },
   "engines": {
-    "node": "20.18.0"
+    "node": "24.16.0"
   },
-  "resolutions": {
-    "cross-spawn": "^7.0.5",
-    "form-data": "^4.0.4",
-    "image-size": "1.2.1",
-    "nanoid": "^3.3.8",
-    "pbkdf2": "^3.1.3"
-  },
-  "packageManager": "pnpm@10.6.5+sha1.da220e966c2db3275efb5928cf8f3592681b106b"
+  "packageManager": "pnpm@10.33.4+sha512.1c67b3b359b2d408119ba1ed289f34b8fc3c6873412bec6fd264fbdc82489e510fcbecb9ce9d22dae7f3b76269d8441046014bdca53b9979cd7a561ad631b800"
 }
