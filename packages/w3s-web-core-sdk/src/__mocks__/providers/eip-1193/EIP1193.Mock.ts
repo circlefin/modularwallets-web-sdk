@@ -96,10 +96,26 @@ export const GetTransactionReceiptParams = ['0xdeadbeef']
 /**
  * Mocks for EIP-1193 rpc responses - eth_getTransactionReceipt.
  */
+export const MockTransactionReceipt = {
+  transactionHash: GetTransactionReceiptParams[0],
+}
+
+/**
+ * Mocks for EIP-1193 rpc responses - eth_getTransactionReceipt.
+ */
 export const MockGetTransactionReceiptResponse = {
   id: undefined,
   jsonrpc: undefined,
-  result: { receipt: { transactionHash: GetTransactionReceiptParams[0] } },
+  result: MockTransactionReceipt,
+}
+
+/**
+ * Mocks for EIP-1193 rpc responses - eth_getTransactionReceipt.
+ */
+export const MockPendingTransactionReceiptResponse = {
+  id: undefined,
+  jsonrpc: undefined,
+  result: null,
 }
 
 /**
