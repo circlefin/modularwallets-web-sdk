@@ -33,8 +33,10 @@ import {
   EthAccountsResponse,
   GetTransactionReceiptParams,
   MockGetTransactionReceiptResponse,
+  MockPendingTransactionReceiptResponse,
   MockSendTransactionResponse,
   MockSendUserOperationResponse,
+  MockTransactionReceipt,
   MockWaitForUserOperationReceiptResponse,
   PersonalSignLowercaseAddressParams,
   PersonalSignEmptyHexParams,
@@ -447,23 +449,44 @@ describe('Providers > eip-1193 > EIP1193Provider > rpc methods', () => {
       params: GetTransactionReceiptParams,
     }
 
-    // Spy on `waitForTransactionReceipt`
-    const waitForGetTransactionReceiptSpy = jest
-      .spyOn(publicClient, 'waitForTransactionReceipt')
-      .mockResolvedValue(MockWaitForUserOperationReceiptResponse as never)
+    const requestSpy = jest
+      .spyOn(publicClient, 'request')
+      .mockResolvedValue(MockTransactionReceipt)
 
     const response = await provider.request<
       string,
       typeof MockGetTransactionReceiptResponse
     >(mockPayload)
 
-    expect(waitForGetTransactionReceiptSpy).toHaveBeenCalledWith({
-      hash: GetTransactionReceiptParams[0],
+    expect(requestSpy).toHaveBeenCalledWith({
+      method: 'eth_getTransactionReceipt',
+      params: GetTransactionReceiptParams,
     })
 
     expect(response).toEqual(MockGetTransactionReceiptResponse)
 
-    waitForGetTransactionReceiptSpy.mockRestore()
+    requestSpy.mockRestore()
+  })
+
+  it('should return null for a pending eth_getTransactionReceipt', async () => {
+    const mockPayload = {
+      method: 'eth_getTransactionReceipt',
+      params: GetTransactionReceiptParams,
+    }
+
+    const requestSpy = jest
+      .spyOn(publicClient, 'request')
+      .mockResolvedValue(null)
+
+    const response = await provider.request<
+      string,
+      typeof MockPendingTransactionReceiptResponse
+    >(mockPayload)
+
+    expect(requestSpy).toHaveBeenCalledTimes(1)
+    expect(response).toEqual(MockPendingTransactionReceiptResponse)
+
+    requestSpy.mockRestore()
   })
 
   it('should throw an error when the addresses are different for eth_signTypedData_v4', async () => {

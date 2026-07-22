@@ -108,8 +108,9 @@ export default class EIP1193Provider<
       case 'eth_getTransactionReceipt': {
         const [hash] = params as [Hex]
 
-        const receipt = await this.publicClient.waitForTransactionReceipt({
-          hash,
+        const receipt = await this.publicClient.request({
+          method: 'eth_getTransactionReceipt',
+          params: [hash],
         })
 
         return this.getResponse(receipt, payload)
