@@ -35,6 +35,7 @@ describe('Clients > createRpClient', () => {
         "cacheTime": 4000,
         "ccipRead": undefined,
         "chain": undefined,
+        "dataSuffix": undefined,
         "extend": [Function],
         "getLoginOptions": [Function],
         "getLoginVerification": [Function],
