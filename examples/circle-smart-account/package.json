@@ -10,7 +10,7 @@
     "@circle-fin/modular-wallets-core": "workspace:*",
     "react": "19.2.7",
     "react-dom": "19.2.7",
-    "viem": "2.23.13"
+    "viem": "2.45.3"
   },
   "devDependencies": {
     "@types/react": "19.2.17",

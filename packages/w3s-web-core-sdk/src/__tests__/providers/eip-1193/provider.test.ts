@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import { createPublicClient, http } from 'viem'
+import { createPublicClient, http, stringToHex, type Hex } from 'viem'
 import {
   createBundlerClient,
   toWebAuthnAccount,
@@ -36,12 +36,17 @@ import {
   MockSendTransactionResponse,
   MockSendUserOperationResponse,
   MockWaitForUserOperationReceiptResponse,
+  PersonalSignLowercaseAddressParams,
+  PersonalSignEmptyHexParams,
+  PersonalSignOneByteParams,
   PersonalSignParams,
   PersonalSignResponse,
+  PersonalSignWeb3TextParams,
   PersonalSignWrongAddressParams,
   SendTransactionParams,
   SendTransactionToAddressMissingParams,
   SignTypedDataV4Params,
+  SignTypedDataV4StringParams,
   SignTypedDataV4WrongAddressParams,
 } from '../../../__mocks__/providers/eip-1193'
 import { toCircleSmartAccount, toWebAuthnCredential } from '../../../accounts'
@@ -198,13 +203,104 @@ describe('Providers > eip-1193 > EIP1193Provider > rpc methods', () => {
       method: 'personal_sign',
       params: PersonalSignParams,
     }
+    const signMessageSpy = jest.spyOn(account, 'signMessage')
 
     const response = await provider.request<
       string,
       typeof PersonalSignResponse
     >(mockPayload)
 
+    expect(signMessageSpy).toHaveBeenCalledWith({
+      message: { raw: PersonalSignParams[0] },
+    })
+    expect(signMessageSpy).not.toHaveBeenCalledWith({
+      message: PersonalSignParams[0],
+    })
     expect(response).toEqual(PersonalSignResponse)
+
+    signMessageSpy.mockRestore()
+  })
+
+  it('should accept lowercase addresses for personal_sign when the account is mixed-case', async () => {
+    const mockPayload = {
+      method: 'personal_sign',
+      params: PersonalSignLowercaseAddressParams,
+    }
+    const signMessageSpy = jest.spyOn(account, 'signMessage')
+
+    const response = await provider.request<
+      string,
+      typeof PersonalSignResponse
+    >(mockPayload)
+
+    expect(signMessageSpy).toHaveBeenCalledWith({
+      message: { raw: PersonalSignLowercaseAddressParams[0] },
+    })
+    expect(response).toEqual(PersonalSignResponse)
+
+    signMessageSpy.mockRestore()
+  })
+
+  it('should sign Web3.js utf8ToHex text payloads as raw bytes for personal_sign', async () => {
+    const mockSignature = '0xweb3-personal-sign' as Hex
+    const mockPayload = {
+      method: 'personal_sign',
+      params: PersonalSignWeb3TextParams,
+    }
+    const signMessageSpy = jest
+      .spyOn(account, 'signMessage')
+      .mockResolvedValue(mockSignature)
+
+    expect(PersonalSignWeb3TextParams[0]).toEqual(stringToHex('Hello World'))
+
+    const response = await provider.request(mockPayload)
+
+    expect(signMessageSpy).toHaveBeenCalledWith({
+      message: { raw: PersonalSignWeb3TextParams[0] },
+    })
+    expect(signMessageSpy).not.toHaveBeenCalledWith({
+      message: PersonalSignWeb3TextParams[0],
+    })
+    expect(response).toEqual({
+      result: mockSignature,
+      jsonrpc: undefined,
+      id: undefined,
+    })
+
+    signMessageSpy.mockRestore()
+  })
+
+  it('should sign empty and one-byte hex payloads as raw bytes for personal_sign', async () => {
+    const mockSignature = '0xedge-personal-sign' as Hex
+    const signMessageSpy = jest
+      .spyOn(account, 'signMessage')
+      .mockResolvedValue(mockSignature)
+
+    for (const params of [
+      PersonalSignEmptyHexParams,
+      PersonalSignOneByteParams,
+    ]) {
+      signMessageSpy.mockClear()
+
+      const response = await provider.request({
+        method: 'personal_sign',
+        params,
+      })
+
+      expect(signMessageSpy).toHaveBeenCalledWith({
+        message: { raw: params[0] },
+      })
+      expect(signMessageSpy).not.toHaveBeenCalledWith({
+        message: params[0],
+      })
+      expect(response).toEqual({
+        result: mockSignature,
+        jsonrpc: undefined,
+        id: undefined,
+      })
+    }
+
+    signMessageSpy.mockRestore()
   })
 
   it('should throw an error when the to parameter is not provided for eth_sendTransaction', async () => {
@@ -393,6 +489,31 @@ describe('Providers > eip-1193 > EIP1193Provider > rpc methods', () => {
     >(mockPayload)
 
     expect(response).toEqual(PersonalSignResponse)
+  })
+
+  it('should return the correct response for eth_signTypedData_v4 when typed data is a JSON string', async () => {
+    const mockPayload = {
+      method: 'eth_signTypedData_v4',
+      params: SignTypedDataV4StringParams,
+    }
+
+    const response = await provider.request<
+      string,
+      typeof PersonalSignResponse
+    >(mockPayload)
+
+    expect(response).toEqual(PersonalSignResponse)
+  })
+
+  it('should throw an error when eth_signTypedData_v4 typed data is invalid JSON', async () => {
+    const mockPayload = {
+      method: 'eth_signTypedData_v4',
+      params: [SignTypedDataV4Params[0], 'not-valid-json'],
+    }
+
+    await expect(() => provider.request(mockPayload)).rejects.toThrow(
+      new Error('Invalid typed data: expected a valid JSON string or object'),
+    )
   })
 
   it('should forward the rpc requests to the bundler client when the method is not handled by itself', async () => {

@@ -2,66 +2,106 @@
 
 This example Vite application demonstrates how to register and log in to a Circle Smart Account using passkeys. It also showcases how to perform a user operation with the account on Polygon Amoy.
 
-## Run the example app
+## Prerequisites
 
-Please follow the instructions to run the example app on your local machine.
+- A [Circle Console](https://console.circle.com/) account with Modular Wallets enabled
+- See Circle’s [console setup guide](https://developers.circle.com/wallets/modular/console-setup) for the full Client Key + Passkey flow
 
-### Environment Variables
+## Environment variables
 
-Before you start to run the app, you need to make sure that all environment variables are configured correctly.
-
-Make a copy of `.env.example` and rename it to `.env`.
-
-Under `.env`, make sure the following environment variables are configured properly:
-
-- `VITE_CLIENT_KEY`: Paste your Client Key here. You can create one in [Circle Developer Console](https://console.circle.com/wallets/modular/configurator).
-- `VITE_CLIENT_URL`: Paste the Client URL here. You can copy it from [Circle Developer Console](https://console.circle.com/wallets/modular/configurator).
-
-Once you have these environment variables setup, you can now follow the steps below to run the app locally.
-
-### Install dependencies
-
-You first need to make sure you have followed the [README](https://github.com/circlefin/modularwallets-web-sdk/blob/master/README.md) under project root and have installed all dependencies under root folder:
+Copy `.env.example` to `.env` in this folder (`examples/circle-smart-account/.env`):
 
 ```bash
-$ pnpm install
+cp .env.example .env
 ```
 
-#### Important: Build the SDK
+| Variable | Description |
+| --- | --- |
+| `VITE_CLIENT_KEY` | Client Key from the Circle Developer Console |
+| `VITE_CLIENT_URL` | Base Client URL from the Circle Developer Console — **without** the chain suffix |
 
-Since this project uses pnpm workspaces, you must build the SDK packages before running the example:
+> [!IMPORTANT]
+> `VITE_CLIENT_URL` must be a full `https://...` URL. The app appends `/polygonAmoy` internally for the modular transport. Passkey (RP) calls use the base URL only. If this variable is empty or already includes `/polygonAmoy`, setup will fail (for example `InvalidProviderError` for `/polygonAmoy`).
+
+Example `.env` shape (use your own credentials):
+
+```env
+VITE_CLIENT_KEY=your-client-key
+VITE_CLIENT_URL=https://modular-sdk.circle.com/v1/rpc/w3s/buidl
+```
+
+Restart `pnpm dev` after changing `.env`.
+
+## Circle console setup
+
+Do **both** of the following in [Configurator](https://console.circle.com/wallets/modular/configurator). Skipping Passkey Domain is a common cause of registration failures.
+
+### 1. Passkey Domain (required)
+
+Configurator → **Passkey** → **Domain Name**:
+
+```text
+localhost
+```
+
+Omit the port, then **Save**.
+
+> [!WARNING]
+> If Passkey Domain is unset, `rp_getRegistrationOptions` fails with  
+> `Cannot find the entity config in the system.` (`code: -32012`).  
+> Creating a Client Key alone is not enough.
+
+### 2. Client Key
+
+1. Create a **Client Key** (Keys → Create a key → Client Key)
+2. Under **Applicable Platforms → Web**, set **Allowed Domain** to `localhost` (no port)
+3. Copy the Client Key and base Client URL into `.env` as above
+
+The Passkey Domain and Client Key Allowed Domain should both be `localhost` for this example.
+
+## Install and run
+
+From the repository root:
 
 ```bash
-# From the project root directory
-$ pnpm build
+pnpm install
+pnpm build
 ```
 
-This will generate the necessary distribution files that this example depends on.
-
-Now you need to go to this example folder:
+Then from this folder:
 
 ```bash
-$ cd examples/circle-smart-account
+cd examples/circle-smart-account
+pnpm dev
 ```
 
-Once you are under the example folder, install all dependencies for the app:
+Open `http://localhost:5173/`.
 
-```bash
-$ pnpm install
-```
+## Smoke test
 
-### Run the app
+1. Enter a **username** that is **5–50 characters**, using only alphanumeric and `_@.:+-` (e.g. `Tester`, not `Test`)
+2. Click **Register** and complete the passkey ceremony (browser / password manager)
+3. Confirm a smart account **Address:** appears
+4. Optional — send a user operation:
+   - Fund the smart account with **Polygon Amoy USDC** (faucet or transfer)
+   - **Address:** any Amoy EVM address you control (or the smart account itself)
+   - **Amount (USDC):** e.g. `0.01`
+   - Click **Send** and confirm a user operation hash / transaction hash appear
 
-To run the app locally:
+## Troubleshooting
 
-```bash
-$ pnpm dev
-```
+| Symptom | Likely cause |
+| --- | --- |
+| `Cannot find the entity config in the system` (`-32012`) | Passkey Domain not set in Configurator (use `localhost`) |
+| `The username is invalid… 5 to 50 characters…` | Username too short or has disallowed characters |
+| `InvalidProviderError` for `/polygonAmoy` | `VITE_CLIENT_URL` missing, includes `/polygonAmoy` already, or `.env` not in this folder |
+| Client key / domain rejected | Client Key Allowed Domain must be `localhost` without a port |
+| Passkey ceremony fails | Browser must support WebAuthn; use HTTPS or `localhost` |
+| `Address mismatch` | SDK version older than `1.0.3` (MSCAUpgradable contract update) |
+| User operation fails | Missing Amoy USDC balance, or paymaster / Circle client config |
 
-Now you should be able to see your app up and running in your browser at: `http://localhost:5173/`.
+## Important notes
 
-### Important Notes
-
-- **Ensure the installed SDK version is greater than or equal to `1.0.3`:**
-
-  If you receive an error message that says `Address mismatch` in the example app, make sure you are using the correct version of the SDK as we updated the MSCAUpgradable smart contract implementation in version `1.0.3`. This error occurs when the SDK version is less than `1.0.3`.
+- Ensure the installed SDK version is greater than or equal to `1.0.3`
+- `.env` lives in `examples/circle-smart-account/`, not the repository root
+- Official setup: [Create a modular wallet (console setup)](https://developers.circle.com/wallets/modular/console-setup)

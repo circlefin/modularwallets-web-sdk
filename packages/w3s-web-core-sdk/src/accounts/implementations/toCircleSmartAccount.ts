@@ -39,6 +39,7 @@ import {
   UPGRADABLE_MSCA as upgradableMsca,
 } from '../../constants'
 import {
+  type CircleSmartAccountImplementation,
   type ToCircleSmartAccountParameters,
   type ToCircleSmartAccountReturnType,
 } from '../../types'
@@ -89,8 +90,10 @@ export async function toCircleSmartAccount(
     walletAddress = wallet.address
   }
 
+  // viem 2.45 narrowed `toSmartAccount`'s client generic; our modular wallet
+  // client satisfies the contract at runtime.
   return toSmartAccount({
-    client,
+    client: client as CircleSmartAccountImplementation['client'],
     entryPoint,
     extend: { abi, factory },
     getAddress: async function (): Promise<Address> {
@@ -227,5 +230,6 @@ export async function toCircleSmartAccount(
         })
       },
     },
+    // viem 2.45's inferred return type omits Circle-specific `extend` metadata.
   })
 }

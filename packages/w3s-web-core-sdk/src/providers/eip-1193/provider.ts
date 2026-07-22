@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+import { isAddress, isAddressEqual } from 'viem'
 import { type BundlerClient } from 'viem/_types/account-abstraction'
 
 import { BaseProvider } from '../base'
@@ -76,7 +77,7 @@ export default class EIP1193Provider<
         await this.validateAddress(address)
 
         const result = await this.bundlerClient.account!.signMessage({
-          message: challenge,
+          message: { raw: challenge },
         })
 
         return this.getResponse(result, payload)
@@ -114,12 +115,28 @@ export default class EIP1193Provider<
         return this.getResponse(receipt, payload)
       }
       case 'eth_signTypedData_v4': {
-        const [address, typedData] = params as [
+        const [address, typedDataParam] = params as [
           Hex,
-          TypedDataDefinition<TypedData, string>,
+          string | TypedDataDefinition<TypedData, string>,
         ]
 
         await this.validateAddress(address)
+
+        let typedData: TypedDataDefinition<TypedData, string>
+        if (typeof typedDataParam === 'string') {
+          try {
+            typedData = JSON.parse(typedDataParam) as TypedDataDefinition<
+              TypedData,
+              string
+            >
+          } catch {
+            throw new Error(
+              'Invalid typed data: expected a valid JSON string or object',
+            )
+          }
+        } else {
+          typedData = typedDataParam
+        }
 
         const result =
           await this.bundlerClient.account!.signTypedData(typedData)
@@ -141,7 +158,12 @@ export default class EIP1193Provider<
   private async validateAddress(address: Hex) {
     const clientAddress = await this.bundlerClient.account!.getAddress()
 
-    if (clientAddress !== address) {
+    // Web3.js checksums addresses before personal_sign / eth_signTypedData_v4;
+    // compare case-insensitively so EIP-55 casing does not fail validation.
+    if (
+      !isAddress(address, { strict: false }) ||
+      !isAddressEqual(clientAddress, address)
+    ) {
       throw new Error('Invalid account')
     }
   }

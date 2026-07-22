@@ -37,6 +37,39 @@ export const PersonalSignParams = [
 ]
 
 /**
+ * Mocks for EIP-1193 rpc params - personal_sign with Web3.js utf8ToHex("Hello World").
+ */
+export const PersonalSignWeb3TextParams = [
+  '0x48656c6c6f20576f726c64',
+  '0x0f6Fed7D7526Aaa1692438AD1D77AaA0Ea9d0a56',
+]
+
+/**
+ * Mocks for EIP-1193 rpc params - personal_sign with empty hex payload.
+ */
+export const PersonalSignEmptyHexParams = [
+  '0x',
+  '0x0f6Fed7D7526Aaa1692438AD1D77AaA0Ea9d0a56',
+]
+
+/**
+ * Mocks for EIP-1193 rpc params - personal_sign with a 1-byte payload.
+ */
+export const PersonalSignOneByteParams = [
+  '0x01',
+  '0x0f6Fed7D7526Aaa1692438AD1D77AaA0Ea9d0a56',
+]
+
+/**
+ * Mocks for EIP-1193 rpc params - personal_sign with a lowercase account address.
+ * Same account as PersonalSignParams (mixed-case / EIP-55), all-lowercase form.
+ */
+export const PersonalSignLowercaseAddressParams = [
+  '0xdeadbeef',
+  '0x0f6fed7d7526aaa1692438ad1d77aaa0ea9d0a56',
+]
+
+/**
  * Mocks for EIP-1193 rpc responses - personal_sign.
  */
 export const PersonalSignResponse = {
@@ -133,27 +166,37 @@ export const SignTypedDataV4WrongAddressParams = [
 /**
  * Mocks for EIP-1193 rpc params - eth_signTypedData_v4.
  */
+const signTypedDataV4TypedData = {
+  domain: {
+    name: 'MockDomain',
+    version: '1',
+    chainId: 1,
+    verifyingContract: '0x9876543210fedcba9876543210fedcba98765432',
+  },
+  message: {
+    content: 'This is a test message',
+  },
+  primaryType: 'Message',
+  types: {
+    EIP712Domain: [
+      { name: 'name', type: 'string' },
+      { name: 'version', type: 'string' },
+      { name: 'chainId', type: 'uint256' },
+      { name: 'verifyingContract', type: 'address' },
+    ],
+    Message: [{ name: 'content', type: 'string' }],
+  },
+}
+
 export const SignTypedDataV4Params = [
   '0x0f6Fed7D7526Aaa1692438AD1D77AaA0Ea9d0a56',
-  {
-    domain: {
-      name: 'MockDomain',
-      version: '1',
-      chainId: 1,
-      verifyingContract: '0x9876543210fedcba9876543210fedcba98765432',
-    },
-    message: {
-      content: 'This is a test message',
-    },
-    primaryType: 'Message',
-    types: {
-      EIP712Domain: [
-        { name: 'name', type: 'string' },
-        { name: 'version', type: 'string' },
-        { name: 'chainId', type: 'uint256' },
-        { name: 'verifyingContract', type: 'address' },
-      ],
-      Message: [{ name: 'content', type: 'string' }],
-    },
-  },
+  signTypedDataV4TypedData,
+]
+
+/**
+ * Mocks for EIP-1193 rpc params - eth_signTypedData_v4 with JSON string typed data.
+ */
+export const SignTypedDataV4StringParams = [
+  '0x0f6Fed7D7526Aaa1692438AD1D77AaA0Ea9d0a56',
+  JSON.stringify(signTypedDataV4TypedData),
 ]

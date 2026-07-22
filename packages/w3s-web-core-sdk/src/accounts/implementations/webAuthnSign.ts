@@ -46,10 +46,28 @@ export const webAuthnSign = async ({
     hash,
   })
 
+  const { challengeIndex, typeIndex, userVerificationRequired } = webauthn
+  if (challengeIndex === undefined || typeIndex === undefined) {
+    throw new Error(
+      'WebAuthn signature metadata missing challengeIndex or typeIndex.',
+    )
+  }
+  if (userVerificationRequired !== true) {
+    throw new Error(
+      'WebAuthn signature metadata requires userVerificationRequired to be true.',
+    )
+  }
+
   return Promise.resolve(
     toWebAuthnSignature({
       signature,
-      webauthn,
+      webauthn: {
+        authenticatorData: webauthn.authenticatorData,
+        clientDataJSON: webauthn.clientDataJSON,
+        challengeIndex,
+        typeIndex,
+        userVerificationRequired,
+      },
     }),
   )
 }

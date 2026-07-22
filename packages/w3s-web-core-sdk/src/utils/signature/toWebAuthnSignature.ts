@@ -95,7 +95,7 @@ export function toWebAuthnSignature({
         clientDataJSON: stringToHex(webauthn.clientDataJSON),
         challengeIndex: BigInt(webauthn.challengeIndex),
         typeIndex: BigInt(webauthn.typeIndex),
-        requireUserVerification: true,
+        requireUserVerification: webauthn.userVerificationRequired,
       },
       r,
       s,
