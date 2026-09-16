@@ -1,16 +1,18 @@
 {
-  "name": "example-circle-smart-account",
+  "name": "example-circle-smart-account-react",
   "version": "0.0.0",
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vite"
+    "dev": "vite",
+    "build": "vite build",
+    "check:type": "tsc --noEmit -p tsconfig.json"
   },
   "dependencies": {
     "@circle-fin/modular-wallets-core": "workspace:*",
     "react": "19.2.7",
     "react-dom": "19.2.7",
-    "viem": "2.45.3"
+    "viem": "2.55.11"
   },
   "devDependencies": {
     "@types/react": "19.2.17",

@@ -1,0 +1,19 @@
+{
+  "name": "example-circle-smart-account-typescript",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "check:type": "tsc --noEmit -p tsconfig.json"
+  },
+  "dependencies": {
+    "@circle-fin/modular-wallets-core": "workspace:*",
+    "viem": "2.55.11"
+  },
+  "devDependencies": {
+    "typescript": "5.8.2",
+    "vite": "5.4.18"
+  }
+}
