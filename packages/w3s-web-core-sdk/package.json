@@ -1,7 +1,7 @@
 {
   "name": "@circle-fin/modular-wallets-core",
   "description": "Serverless Typescript SDK",
-  "version": "1.0.15",
+  "version": "1.0.16",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
@@ -24,7 +24,7 @@
   },
   "dependencies": {
     "uuid": "^11.0.3",
-    "viem": "2.45.3",
+    "viem": "2.55.11",
     "web3": "4.16.0",
     "webauthn-p256": "0.0.5"
   },

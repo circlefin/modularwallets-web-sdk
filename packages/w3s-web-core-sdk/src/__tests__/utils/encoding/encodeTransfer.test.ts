@@ -17,6 +17,7 @@
  */
 
 import {
+  MockEncodedArcMainnetTokenTransferResult,
   MockEncodedERC20TransferResult,
   MockEncodedPredefinedTokenTransferResult,
   MockRecipientAddress,
@@ -32,6 +33,15 @@ describe('Utils > encoding > encodeTransfer', () => {
       100n,
     )
     expect(result).toEqual(MockEncodedPredefinedTokenTransferResult)
+  })
+
+  it('should encode an ERC-20 transfer correctly using the Arc Mainnet token', () => {
+    const result = encodeTransfer(
+      MockRecipientAddress,
+      ContractAddress.Arc_USDC,
+      100n,
+    )
+    expect(result).toEqual(MockEncodedArcMainnetTokenTransferResult)
   })
 
   it('should encode an ERC-20 transfer correctly using the passed-in token address', () => {
