@@ -25,6 +25,7 @@
       "outputs": ["eslint_report.json"]
     },
     "check:type": {
+      "dependsOn": ["^build"],
       "outputs": []
     }
   }

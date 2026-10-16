@@ -45,6 +45,7 @@ describe('Clients > createRpClient', () => {
         "name": "RP Client",
         "pollingInterval": 4000,
         "request": [Function],
+        "tokens": undefined,
         "type": "RpClient",
       }
     `)

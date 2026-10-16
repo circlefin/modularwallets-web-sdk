@@ -1,0 +1,107 @@
+/*
+ * Copyright (c) 2026, Circle Internet Group, Inc. All rights reserved.
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+}
+
+body {
+  max-width: 45rem;
+  margin-inline: auto;
+  padding-inline: 1rem;
+  font-family: -apple-system, BlinkMacSystemFont, avenir next, avenir, segoe ui, helvetica neue, Adwaita Sans, Cantarell, Ubuntu, roboto, noto, helvetica, arial, sans-serif;
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-block: 2em 1em;
+}
+
+button {
+  background-color: white;
+  border: 1px solid lightgray;
+  color: darkslategrey;
+  padding: 0.5em 1em;
+  font-weight: bold;
+  border-radius: 0.5em;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  &:not(:disabled):hover {
+    background-color: whitesmoke;
+  }
+  &:disabled {
+    opacity: 0.7;
+    color: lightslategrey;
+    cursor: not-allowed;
+    background-color: whitesmoke;
+  }
+}
+
+main button {
+  margin-block-end: 1em;
+}
+
+p {
+  line-height: 1.39;
+  margin-block-end: 1em;
+}
+
+code {
+  font-size-adjust: 0.65;
+  color: darkgreen
+}
+
+hr {
+  margin-block-end: 1em;
+}
+
+pre:not(:empty) {
+  background-color: ghostwhite;
+  padding: 1em;
+  max-width: 100%;
+  overflow: auto;
+  border-radius: 0.5em;
+  max-height: 28em;
+  word-break: break-all;
+  white-space: pre-wrap;
+  line-height: 1.5;
+}
+
+.faucet-link {
+  margin-inline-start: 0.5em;
+  text-decoration-style: dotted;
+  text-underline-offset: 2px;
+  color: inherit;
+}
+
+.faucet-link:hover {
+  text-decoration-style: solid;
+}
+
+.faucet-link::after {
+    content: "";
+    width: .8em;
+    height: .8em;
+    display: inline-block;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 26 26'%3E%3Cg transform='translate(0.000000, -1.000000)'%3E%3Cpath fill='dimgrey' d='M18,18.759 L18,22.125 C18,23.159 17.159,24 16.125,24 L4.875,24 C3.841,24 3,23.159 3,22.125 L3,10.875 C3,9.841 3.841,9 4.875,9 L8.304,9 L11.305,6 L4.875,6 C2.182,6 0,8.182 0,10.875 L0,22.125 C0,24.818 2.182,27 4.875,27 L16.125,27 C18.818,27 21,24.818 21,22.125 L21,15.758 L18,18.759 L18,18.759 Z'%3E%3C/path%3E%3Cpath fill='dimgrey' d='M22.581,1 L12.322,1 C10.436,1.002 10.567,1.51 11.562,2.504 L14.782,5.724 L9.262,11.243 C8.117,12.387 8.118,14.241 9.262,15.384 L11.672,17.795 C12.816,18.936 14.668,18.937 15.812,17.794 L21.332,12.274 L24.492,15.434 C25.593,16.534 25.999,16.563 25.999,14.677 L26,4.419 C25.999,0.982 26.024,0.999 22.581,1 L22.581,1 Z'%3E%3C/path%3E%3C/g%3E%3C/svg%3E%0A");
+    background-size: cover;
+    margin-inline-start: .25em;
+}

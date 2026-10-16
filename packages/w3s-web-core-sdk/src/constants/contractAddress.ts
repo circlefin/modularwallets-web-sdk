@@ -23,6 +23,8 @@ export enum ContractAddress {
   ArbitrumSepolia_USDC = '0x75faf114eafb1BDbe2F0316DF893fd58CE46AA4d',
 
   // Arc Tokens
+  Arc_USDC = '0x3600000000000000000000000000000000000000',
+  // eslint-disable-next-line @typescript-eslint/no-duplicate-enum-values
   ArcTestnet_USDC = '0x3600000000000000000000000000000000000000',
 
   // Avalanche Tokens

@@ -33,6 +33,14 @@ export const MockEncodedPredefinedTokenTransferResult = {
 }
 
 /**
+ * Mocks for the utility function - encodeTransfer Arc Mainnet response.
+ */
+export const MockEncodedArcMainnetTokenTransferResult = {
+  data: '0xa9059cbb000000000000000000000000f39fd6e51aad88f6f4ce6ab8827279cfffb922660000000000000000000000000000000000000000000000000000000000000064',
+  to: '0x3600000000000000000000000000000000000000',
+}
+
+/**
  * Mocks for the utility function - encodeTransfer response.
  */
 export const MockEncodedERC20TransferResult = {
